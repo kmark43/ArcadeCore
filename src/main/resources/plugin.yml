@@ -1,0 +1,22 @@
+name: ArcadeCore
+version: 0.1
+main: net.mutinies.arcadecore.ArcadeCorePlugin
+
+depend: [ProtocolLib]
+
+commands:
+  game:
+    description: Manages the current game
+    usage: |
+      /game start
+      /game stop
+      /game set <gameName>
+      /game list
+  game start:
+    description: Starts the game
+  game stop:
+    description: Stops the game
+  game set:
+    description: Sets the current game game
+  game list:
+    description: Lists the available game

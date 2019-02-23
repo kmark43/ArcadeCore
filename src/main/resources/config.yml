@@ -1,0 +1,5 @@
+# Modes = [ Classic, NoLobby, Competitive ]
+arcadeMode: NoLobby
+
+# Used in Classic Mode
+# defaultGame: paintball
