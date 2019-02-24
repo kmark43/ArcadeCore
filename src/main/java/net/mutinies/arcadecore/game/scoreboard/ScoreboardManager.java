@@ -1,8 +1,6 @@
 package net.mutinies.arcadecore.game.scoreboard;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
-import net.mutinies.arcadecore.game.Game;
-import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.manager.Manager;
 import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.scoreboard.ProtocolScoreboardDisplay;
@@ -17,7 +15,6 @@ import java.util.*;
 import java.util.function.Function;
 
 public class ScoreboardManager implements Manager, Module {
-    private Game game;
     private Function<Player, List<String>> lineFunction;
     private Map<UUID, ScoreboardDisplay> displayMap;
     
@@ -26,8 +23,7 @@ public class ScoreboardManager implements Manager, Module {
     private BukkitTask scoreboardUpdater;
     private boolean enabled = false;
     
-    public ScoreboardManager(Game game) {
-        this.game = game;
+    public ScoreboardManager() {
         currentTitle = "";
     }
     
@@ -83,7 +79,7 @@ public class ScoreboardManager implements Manager, Module {
     
     private boolean shouldDisplay() {
         return enabled &&
-                game.getGameStateManager().getState() != GameStateManager.GameState.NOT_ACTIVE &&
+//                game.getGameStateManager().getState() != GameStateManager.GameState.NOT_ACTIVE &&
                 lineFunction != null;
     }
     

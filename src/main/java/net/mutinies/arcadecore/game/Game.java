@@ -52,7 +52,7 @@ public class Game {
         moduleManager = new ModuleManager(this);
         spectateManager = new SpectateManager(this);
         projectileManager = new ProjectileManager(this);
-        scoreboardManager = new ScoreboardManager(this);
+        scoreboardManager = new ScoreboardManager();
         
         gameStateManager = new GameStateManager(this);
     }

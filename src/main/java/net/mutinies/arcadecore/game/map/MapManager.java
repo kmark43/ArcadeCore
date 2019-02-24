@@ -5,7 +5,10 @@ import net.mutinies.arcadecore.game.Game;
 import org.bukkit.Bukkit;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MapManager {
     private Game game;
@@ -60,11 +63,14 @@ public class MapManager {
         setCurrentMap(maps.get((int)(Math.random() * maps.size())));
     }
     
-    public void setCurrentMap(GameMap map) {
+    public void clearMap() {
         if (currentMap != null) {
             currentMap.unloadWorld();
+            currentMap = null;
         }
-        
+    }
+    
+    public void setCurrentMap(GameMap map) {
         if (map != null) {
             this.currentMap = map;
             currentMap.loadWorld();

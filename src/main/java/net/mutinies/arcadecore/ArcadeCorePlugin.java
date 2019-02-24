@@ -2,12 +2,13 @@ package net.mutinies.arcadecore;
 
 import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.arcade.ArcadeManager;
-import net.mutinies.arcadecore.arcade.ClassicGameManager;
+import net.mutinies.arcadecore.arcade.classic.ClassicGameManager;
 import net.mutinies.arcadecore.arcade.CompetitiveGameManager;
 import net.mutinies.arcadecore.arcade.lobbyless.LobbylessGameManager;
 import net.mutinies.arcadecore.cooldown.CooldownManager;
 import net.mutinies.arcadecore.games.GameMaker;
 import net.mutinies.arcadecore.graphics.inventory.GuiManager;
+import net.mutinies.arcadecore.item.ClickEvent;
 import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.manager.ManagerHandler;
 import net.mutinies.arcadecore.weather.WorldWeatherPreventer;
@@ -54,6 +55,8 @@ public class ArcadeCorePlugin extends JavaPlugin implements Listener {
             case "classic":
                 Bukkit.getLogger().info("Loading classic arcade");
                 gameManager = new ClassicGameManager();
+                String defaultGame = getConfig().getString("defaultGame");
+                Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> gameManager.setGame(defaultGame));
                 break;
             case "nolobby":
                 Bukkit.getLogger().info("Loading lobbyless arcade");
@@ -72,6 +75,14 @@ public class ArcadeCorePlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(gameManager, this);
         
         this.arcadeManager = new ArcadeManager();
+        
+        ItemManager itemManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(ItemManager.class);
+        itemManager.registerTag("select_kit", e -> {
+            e.setCancelled(true);
+            if (e.getClickType() == ClickEvent.ClickType.RIGHT) {
+                gameManager.getGame().getKitManager().showGameKitGui(e.getPlayer());
+            }
+        });
         
         createSampleGame();
     }

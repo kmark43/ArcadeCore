@@ -1,12 +1,11 @@
 package net.mutinies.arcadecore.game.kit;
 
-import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.graphics.inventory.InventoryWindow;
 import net.mutinies.arcadecore.graphics.inventory.WindowButton;
-import net.mutinies.arcadecore.item.ClickEvent;
 import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.util.ItemBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,19 +29,10 @@ public class DefaultKitManager implements KitManager {
     
     @Override
     public void enable() {
-        ItemManager itemManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(ItemManager.class);
-        itemManager.registerTag("select_kit", e -> {
-            e.setCancelled(true);
-            if (e.getClickType() == ClickEvent.ClickType.RIGHT) {
-                showGameKitGui(e.getPlayer());
-            }
-        });
     }
     
     @Override
     public void disable() {
-        ItemManager itemManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(ItemManager.class);
-        itemManager.unregister("select_kit");
     }
     
     @EventHandler
@@ -57,10 +47,39 @@ public class DefaultKitManager implements KitManager {
             int j = i;
             window.set(i, new WindowButton(ItemBuilder.of(kits.get(j).getRepresentingStack()).name(kits.get(j).getDisplayName()).build(), clickEvent -> {
                 setKit(player, kits.get(j));
-                game.getGameStateManager().giveKitSelectionItem(player);
+                giveKitSelectionItem(player);
             }));
         }
         window.show(player);
+    }
+    
+    @Override
+    public void setDefaultKits() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            setDefaultKit(player);
+        }
+    }
+    
+    @Override
+    public void setDefaultKit(Player player) {
+        Kit kit = getKit(player);
+        if (kit == null) {
+            setKit(player, getKits().get(0));
+        }
+    }
+    
+    @Override
+    public void giveKitSelectionItems() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            giveKitSelectionItem(player);
+        }
+    }
+    
+    @Override
+    public void giveKitSelectionItem(Player player) {
+        Kit kit = game.getKitManager().getKit(player);
+        ItemStack kitStack = ItemManager.tag(kit.getRepresentingStack(), "select_kit");
+        player.getInventory().setItem(0, kitStack);
     }
     
     @Override

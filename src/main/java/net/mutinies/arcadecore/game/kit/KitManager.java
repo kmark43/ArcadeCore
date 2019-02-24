@@ -7,6 +7,10 @@ import java.util.List;
 
 public interface KitManager extends Module  {
     void showGameKitGui(Player player);
+    void giveKitSelectionItems();
+    void giveKitSelectionItem(Player player);
+    void setDefaultKits();
+    void setDefaultKit(Player player);
     void setKit(Player player, Kit kit);
     Kit getKit(Player player);
     void addKit(Kit kit);

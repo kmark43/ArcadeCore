@@ -8,16 +8,15 @@ import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.map.MapManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.game.team.TeamManager;
-import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.modules.prevent.NoDamageModule;
 import net.mutinies.arcadecore.modules.prevent.NoHungerChangeModule;
 import net.mutinies.arcadecore.modules.prevent.NoInteractModule;
+import net.mutinies.arcadecore.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
@@ -25,6 +24,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static net.mutinies.arcadecore.util.ModuleUtil.disableModules;
+import static net.mutinies.arcadecore.util.ModuleUtil.enableModules;
 
 public class GameStateManager {
     public enum GameState {
@@ -99,6 +101,7 @@ public class GameStateManager {
             case NOT_ACTIVE:
                 disableModules(generalModules);
                 ArcadeCorePlugin.getInstance().getGameManager().handleGameStop();
+                game.getMapManager().clearMap();
                 break;
             case STARTING:
                 // todo make 6, 3 for quicker debugging
@@ -107,13 +110,13 @@ public class GameStateManager {
                 enableModules(generalModules);
                 enableModules(startModules);
                 assignTeams();
-                setDefaultKits();
+                game.getKitManager().setDefaultKits();
                 teleportPlayersToGame();
-                giveKitSelectionItems();
+                game.getKitManager().giveKitSelectionItems();
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.RUNNING), 20 * startDelay);
                 break;
             case RUNNING:
-                setPlayerRunningState();
+                Bukkit.getOnlinePlayers().forEach(PlayerUtil::setDefaultPlayerState);
                 teleportPlayersToSpawnpoints();
                 giveKits();
                 enableModules(runningModules);
@@ -126,36 +129,6 @@ public class GameStateManager {
                 game.getEndHandler().onWin(game);
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.NOT_ACTIVE), 20 * endDelay);
                 break;
-        }
-    }
-    
-    public void giveKitSelectionItems() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            giveKitSelectionItem(player);
-        }
-    }
-    
-    public void giveKitSelectionItem(Player player) {
-        Kit kit = game.getKitManager().getKit(player);
-        ItemStack kitStack = ItemManager.tag(kit.getRepresentingStack(), "select_kit");
-        player.getInventory().setItem(0, kitStack);
-    }
-    
-    private void setPlayerRunningState() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.setGameMode(GameMode.ADVENTURE);
-            clearInventory(player);
-            player.setFlying(false);
-            player.setAllowFlight(false);
-            player.setLevel(0);
-            player.setLastDamageCause(null);
-            player.setLastDamage(0);
-            player.setMaxHealth(20);
-            player.setHealth(20);
-            for (PotionEffect effect : new ArrayList<>(player.getActivePotionEffects())) {
-                player.removePotionEffect(effect.getType());
-            }
-            player.setExp(0);
         }
     }
     
@@ -174,16 +147,6 @@ public class GameStateManager {
                 player.removePotionEffect(effect.getType());
             }
             player.setExp(0);
-        }
-    }
-    
-    private void setDefaultKits() {
-        KitManager kitManager = game.getKitManager();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Kit kit = kitManager.getKit(player);
-            if (kit == null) {
-                kitManager.setKit(player, kitManager.getKits().get(0));
-            }
         }
     }
     
@@ -241,30 +204,6 @@ public class GameStateManager {
             clearInventory(player);
             
             kit.giveItems(player);
-        }
-    }
-    
-    private void enableModules(List<Module> modules) {
-        for (Module module : modules) {
-            if (module == null) continue;
-            Bukkit.getPluginManager().registerEvents(module, ArcadeCorePlugin.getInstance());
-            try {
-                module.enable();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    
-    private void disableModules(List<Module> modules) {
-        for (Module module : modules) {
-            if (module == null) continue;
-            try {
-                module.disable();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            HandlerList.unregisterAll(module);
         }
     }
     
