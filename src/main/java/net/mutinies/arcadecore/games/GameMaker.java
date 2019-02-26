@@ -16,6 +16,7 @@ import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.modules.gamescore.PlayerEliminationModule;
 import net.mutinies.arcadecore.modules.gamescore.PlayerKillTargetModule;
 import net.mutinies.arcadecore.modules.gamescore.TeamEliminationModule;
+import net.mutinies.arcadecore.modules.prevent.NoFriendlyFireModule;
 import net.mutinies.arcadecore.modules.prevent.NoPearlTeleportModule;
 import net.mutinies.arcadecore.modules.prevent.NoRegenModule;
 import net.mutinies.arcadecore.util.ItemBuilder;
@@ -60,6 +61,7 @@ public class GameMaker {
                 new NoPearlTeleportModule(),
                 new PaintBlockModule(paintball),
                 new PaintDeathMessageModule(),
+                new NoFriendlyFireModule(),
                 gunModule,
                 reviveModule,
                 armorPaintingModule);
@@ -71,6 +73,10 @@ public class GameMaker {
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         
         Gun machineGun = new Gun("machine_gun", "Machine Gun", "gun_machine_gun", 150, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(2.4, .25));
+        OverheatingModule overheatingModule = new OverheatingModule("machine_gun_heating", .97, 250, 0.025, 0.020);
+        machineGun.addShotRequirement(overheatingModule);
+        machineGun.addLaunchHandler(overheatingModule);
+        machineGun.addExpUpdater(overheatingModule);
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         
         Gun sniper = new Gun("sniper", "Sniper", "gun_sniper", 1400, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
