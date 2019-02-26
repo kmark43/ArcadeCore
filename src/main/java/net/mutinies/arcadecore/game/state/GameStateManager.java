@@ -86,11 +86,13 @@ public class GameStateManager {
                 
                 if (newState != GameState.ENDING) {
                     disableModules(game.getModuleManager().getGameModules());
+                    disableModules(getKitModules());
                 }
                 disableModules(Arrays.asList(game.getEndHandler()));
                 break;
             case ENDING:
                 disableModules(game.getModuleManager().getGameModules());
+                disableModules(getKitModules());
                 disableModules(endingModules);
                 break;
         }
@@ -121,6 +123,7 @@ public class GameStateManager {
                 giveKits();
                 enableModules(runningModules);
                 enableModules(game.getModuleManager().getGameModules());
+                enableModules(getKitModules());
                 enableModules(Arrays.asList(game.getEndHandler()));
                 break;
             case ENDING:
@@ -130,6 +133,15 @@ public class GameStateManager {
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.NOT_ACTIVE), 20 * endDelay);
                 break;
         }
+    }
+    
+    private List<Module> getKitModules() {
+        Set<Module> kitModules = new HashSet<>();
+        List<Kit> kits = game.getKitManager().getKits();
+        for (Kit kit : kits) {
+            kitModules.addAll(kit.getModules());
+        }
+        return new ArrayList<>(kitModules);
     }
     
     private void setPlayerStartingStates() {
