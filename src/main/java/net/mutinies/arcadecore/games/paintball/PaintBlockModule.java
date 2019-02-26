@@ -31,9 +31,7 @@ public class PaintBlockModule implements Module {
             
             Location loc = e.getEntity().getLocation().clone().add(e.getEntity().getVelocity().normalize().multiply(.1));
     
-            Set<Block> blocks = new HashSet<>();
-            blocks.addAll(getInRadius(e.getEntity().getLocation(), 2.5d));
-            for (Block block : blocks) {
+            for (Block block : getInRadius(e.getEntity().getLocation(), 2.5d)) {
                 switch (block.getType()) {
                     case CLAY:
                     case HARD_CLAY:
