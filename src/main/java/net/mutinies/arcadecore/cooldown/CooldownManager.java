@@ -14,10 +14,12 @@ import java.util.UUID;
 
 public class CooldownManager implements Manager {
     private class CooldownTask {
+        private long startTime;
         private long endTime;
         private BukkitTask task;
     
         public CooldownTask(long endTime, BukkitTask task) {
+            this.startTime = System.currentTimeMillis();
             this.endTime = endTime;
             this.task = task;
         }
@@ -56,6 +58,20 @@ public class CooldownManager implements Manager {
         }
     }
     
+    public void setCooldown(Player player, String key, long cooldown) {
+        if (!cooldownMap.containsKey(player.getUniqueId())) {
+            cooldownMap.put(player.getUniqueId(), new HashMap<>());
+        }
+        Map<String, CooldownTask> taskMap = cooldownMap.get(player.getUniqueId());
+    
+        clearCooldown(player, key);
+        
+        long endTime = System.currentTimeMillis() + cooldown;
+        BukkitTask task = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> taskMap.remove(key), cooldown * 20 / 1000);
+        // todo add event when cooled down
+        taskMap.put(key, new CooldownTask(endTime, task));
+    }
+    
     public boolean isAvailable(Player player, String key) {
         if (!cooldownMap.containsKey(player.getUniqueId())) {
             return true;
@@ -72,6 +88,19 @@ public class CooldownManager implements Manager {
         
         if (taskMap.containsKey(key)) {
             long time = taskMap.get(key).endTime - System.currentTimeMillis();
+            return (int)time;
+        }
+        return -1;
+    }
+    
+    public int getTimeElapsed(Player player, String key) {
+        if (!cooldownMap.containsKey(player.getUniqueId())) {
+            return -1;
+        }
+        Map<String, CooldownTask> taskMap = cooldownMap.get(player.getUniqueId());
+        
+        if (taskMap.containsKey(key)) {
+            long time = System.currentTimeMillis() - taskMap.get(key).startTime;
             return (int)time;
         }
         return -1;
