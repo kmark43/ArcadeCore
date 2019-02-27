@@ -215,6 +215,7 @@ public class GameStateManager {
             clearInventory(player);
             
             kit.giveItems(player);
+            kit.giveEffects(player);
         }
     }
     

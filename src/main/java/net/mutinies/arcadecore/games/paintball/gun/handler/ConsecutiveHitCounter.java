@@ -23,8 +23,6 @@ public class ConsecutiveHitCounter implements LaunchHandler, ProjectileDamageHan
     @Override
     public void register(Gun gun) {
         gun.addLaunchHandler(this);
-        gun.addLaunchHandler((gun1, player, projectile) -> projectile.addDamageHandler(this));
-        gun.addLaunchHandler((gun1, player, projectile) -> projectile.addHitHandler(this));
     }
     
     @Override
@@ -62,15 +60,6 @@ public class ConsecutiveHitCounter implements LaunchHandler, ProjectileDamageHan
     
     @Override
     public void onProjectileLaunch(Gun gun, Player player, ListeningProjectile projectile) {
-        int hits = hitMap.getOrDefault(player.getUniqueId(), 0);
-        double damage;
-        if (hits == 3) {
-            hitMap.put(player.getUniqueId(), 0);
-            damage = 10;
-        } else {
-            damage = 5;
-        }
-        projectile.addDamageHandler(new StaticDamageHandler(damage));
         projectile.addDamageHandler(this);
         projectile.addHitHandler(this);
     }

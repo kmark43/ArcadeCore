@@ -24,6 +24,8 @@ import net.mutinies.arcadecore.util.ModuleUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 
@@ -67,25 +69,86 @@ public class GameMaker {
                 gunModule,
                 reviveModule,
                 armorPaintingModule);
-        
+    
+        // Rifle
         Gun rifle = new Gun("rifle", "Rifle", "gun_rifle", 500, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(3, .01));
         rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(15))));
+        gunModule.registerGun(rifle);
         
+        ItemStack rifleStack = ItemManager.tag(ItemBuilder.of(Material.IRON_BARDING).name("" + ChatColor.WHITE + "Rifle").build(), "gun_rifle");
+    
+        BasicKit rifleKit = new BasicKit("rifle", "Rifle",
+                rifleStack,
+                player -> Arrays.asList(rifleStack, reviveModule.getReviveStack(player, 3)),
+                new TeamArmorGenerator());
+        
+        rifleKit.addEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, 0, false, false));
+        paintball.getKitManager().addKit(rifleKit);
+    
+        // Shotgun
         Gun shotgun = new Gun("shotgun", "Shotgun", "gun_shotgun", 1400, ProjectileType.PELLET, 8, new StaticInitialVelocityDeterminer(1.5, .4));
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
+        gunModule.registerGun(shotgun);
         
+        ItemStack shotgunStack = ItemManager.tag(ItemBuilder.of(Material.GOLD_BARDING).name("" + ChatColor.WHITE + "Shotgun").build(), "gun_shotgun");
+    
+        BasicKit shotgunKit = new BasicKit("shotgun", "Shotgun",
+                shotgunStack,
+                player -> Arrays.asList(shotgunStack, reviveModule.getReviveStack(player, 3)),
+                new TeamArmorGenerator());
+    
+        shotgunKit.addEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, 1, false, false));
+        
+        paintball.getKitManager().addKit(shotgunKit);
+        
+        // Machine gun
         Gun machineGun = new Gun("machine_gun", "Machine Gun", "gun_machine_gun", 150, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(2.4, .25));
         machineGun.addListener(new OverheatingModule("machine_gun_heating", .97, 250, 0.025, 0.020));
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
+        gunModule.registerGun(machineGun);
         
+        ItemStack machineGunStack = ItemManager.tag(ItemBuilder.of(Material.DIAMOND_BARDING).name("" + ChatColor.WHITE + "Machine Gun").build(), "gun_machine_gun");
+    
+        BasicKit machineGunKit = new BasicKit("machine_gun", "Machine Gun",
+                machineGunStack,
+                player -> Arrays.asList(machineGunStack, reviveModule.getReviveStack(player, 3)),
+                new TeamArmorGenerator());
+        
+        paintball.getKitManager().addKit(machineGunKit);
+        
+        // Sniper
         Gun sniper = new Gun("sniper", "Sniper", "gun_sniper", 1400, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         sniper.addScopeHandler(new FreezeWhenScopedHandler());
         sniper.addListener(new ChargingScope(1000, 1, 4, 1));
+        gunModule.registerGun(sniper);
         
+        ItemStack sniperStack = ItemManager.tag(ItemBuilder.of(Material.STONE_HOE).unbreakable().name("" + ChatColor.WHITE + "Sniper").build(), "gun_sniper");
+    
+        BasicKit sniperKit = new BasicKit("sniper", "Sniper",
+                sniperStack,
+                player -> Arrays.asList(sniperStack, reviveModule.getReviveStack(player, 3)),
+                new TeamArmorGenerator());
+        
+        paintball.getKitManager().addKit(sniperKit);
+        
+        // Bazooka
         Gun bazooka = new Gun("bazooka", "Bazooka", "gun_bazooka", 5000, ProjectileType.FIREBALL, 1, new StaticInitialVelocityDeterminer(.8));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new AccelerationHandler())));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new AreaOfEffectDamage())));
+        gunModule.registerGun(bazooka);
         
+        ItemStack bazookaStack = ItemManager.tag(ItemBuilder.of(Material.BLAZE_ROD).name("" + ChatColor.WHITE + "Bazooka").build(), "gun_bazooka");
+    
+        BasicKit bazookaKit = new BasicKit("bazooka", "Bazooka",
+                bazookaStack,
+                player -> Arrays.asList(bazookaStack, reviveModule.getReviveStack(player, 3)),
+                new TeamArmorGenerator());
+        
+        bazookaKit.addEffect(new PotionEffect(PotionEffectType.JUMP, 1000000, 1, false, false));
+        
+        paintball.getKitManager().addKit(bazookaKit);
+        
+        // Needler
         Gun needler = new Gun("needler", "Needler", "gun_needler", 500, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         ConsecutiveHitCounter needlerHitCounter = new ConsecutiveHitCounter();
         needler.addListener(needlerHitCounter);
@@ -99,60 +162,37 @@ public class GameMaker {
             }
         }));
         
+        gunModule.registerGun(needler);
+        
+        ItemStack needlerStack = ItemManager.tag(ItemBuilder.of(Material.ARROW).name("" + ChatColor.WHITE + "Needler").build(), "gun_needler");
+    
+        BasicKit needlerKit = new BasicKit("needler", "Needler",
+                needlerStack,
+                player -> Arrays.asList(needlerStack, reviveModule.getReviveStack(player, 3)),
+                new TeamArmorGenerator());
+    
+        needlerKit.addEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, 2, false, false));
+        
+        paintball.getKitManager().addKit(needlerKit);
+        
+        // Medic
         Gun medic = new Gun("medic", "Medic", "gun_medic", 1000, ProjectileType.PELLET, 4, new StaticInitialVelocityDeterminer(1.5, .6));
         medic.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         medic.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticHealHandler(5))));
         medic.addLaunchHandler(new TargetChooser(paintball, true, false));
+        gunModule.registerGun(medic);
         
-        Gun[] guns = {rifle, shotgun, machineGun, sniper, bazooka, needler, medic};
-    
-        for (Gun gun : guns) {
-            gunModule.registerGun(gun);
-        }
-    
-        ItemStack rifleStack = ItemManager.tag(ItemBuilder.of(Material.IRON_BARDING).name("" + ChatColor.WHITE + "Rifle").build(), "gun_rifle");
-        ItemStack shotgunStack = ItemManager.tag(ItemBuilder.of(Material.GOLD_BARDING).name("" + ChatColor.WHITE + "Shotgun").build(), "gun_shotgun");
-        ItemStack machineGunStack = ItemManager.tag(ItemBuilder.of(Material.DIAMOND_BARDING).name("" + ChatColor.WHITE + "Machine Gun").build(), "gun_machine_gun");
-        ItemStack sniperStack = ItemManager.tag(ItemBuilder.of(Material.STONE_HOE).unbreakable().name("" + ChatColor.WHITE + "Sniper").build(), "gun_sniper");
-        ItemStack bazookaStack = ItemManager.tag(ItemBuilder.of(Material.BLAZE_ROD).name("" + ChatColor.WHITE + "Bazooka").build(), "gun_bazooka");
-        ItemStack needlerStack = ItemManager.tag(ItemBuilder.of(Material.ARROW).name("" + ChatColor.WHITE + "Needler").build(), "gun_needler");
         ItemStack medicStack = ItemManager.tag(ItemBuilder.of(Material.WOOD_SPADE).unbreakable().name("" + ChatColor.WHITE + "Medic").build(), "gun_medic");
-
-        paintball.getKitManager().addKit(new BasicKit("rifle", "Rifle",
-                rifleStack,
-                player -> Arrays.asList(rifleStack, reviveModule.getReviveStack(player, 3)),
-                new TeamArmorGenerator()));
-        
-        paintball.getKitManager().addKit(new BasicKit("shotgun", "Shotgun",
-                shotgunStack,
-                player -> Arrays.asList(shotgunStack, reviveModule.getReviveStack(player, 3)),
-                new TeamArmorGenerator()));
-        
-        paintball.getKitManager().addKit(new BasicKit("machine_gun", "Machine Gun",
-                machineGunStack,
-                player -> Arrays.asList(machineGunStack, reviveModule.getReviveStack(player, 3)),
-                new TeamArmorGenerator()));
-        
-        paintball.getKitManager().addKit(new BasicKit("sniper", "Sniper",
-                sniperStack,
-                player -> Arrays.asList(sniperStack, reviveModule.getReviveStack(player, 3)),
-                new TeamArmorGenerator()));
-        
-        paintball.getKitManager().addKit(new BasicKit("bazooka", "Bazooka",
-                bazookaStack,
-                player -> Arrays.asList(bazookaStack, reviveModule.getReviveStack(player, 3)),
-                new TeamArmorGenerator()));
-        
-        paintball.getKitManager().addKit(new BasicKit("needler", "Needler",
-                needlerStack,
-                player -> Arrays.asList(needlerStack, reviveModule.getReviveStack(player, 3)),
-                new TeamArmorGenerator()));
-        
-        paintball.getKitManager().addKit(new BasicKit("medic", "Medic",
+    
+        BasicKit medicKit = new BasicKit("medic", "Medic",
                 medicStack,
                 player -> Arrays.asList(medicStack, reviveModule.getReviveStack(player, 3)),
-                new TeamArmorGenerator()));
-    
+                new TeamArmorGenerator());
+        
+        paintball.getKitManager().addKit(medicKit);
+        
+        medicKit.addEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, 1, false, false));
+
         ArcadeCorePlugin.getInstance().getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
     }
     

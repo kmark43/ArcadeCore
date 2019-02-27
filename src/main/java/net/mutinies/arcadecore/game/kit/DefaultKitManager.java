@@ -1,5 +1,6 @@
 package net.mutinies.arcadecore.game.kit;
 
+import net.mutinies.arcadecore.event.GameRespawnEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.graphics.inventory.InventoryWindow;
 import net.mutinies.arcadecore.graphics.inventory.WindowButton;
@@ -38,6 +39,11 @@ public class DefaultKitManager implements KitManager {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         playerKits.remove(e.getPlayer().getUniqueId());
+    }
+    
+    @EventHandler
+    public void onPlayerRevive(GameRespawnEvent e) {
+        getKit(e.getPlayer()).giveEffects(e.getPlayer());
     }
     
     @Override

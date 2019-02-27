@@ -121,6 +121,9 @@ public class PlayerSnapshot {
         player.setScoreboard(scoreboard);
         player.getInventory().setContents(inventoryContents);
         player.getInventory().setArmorContents(armorContents);
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
         player.addPotionEffects(potionEffectList);
         if (vehicle != null) {
             vehicle.setPassenger(player);
