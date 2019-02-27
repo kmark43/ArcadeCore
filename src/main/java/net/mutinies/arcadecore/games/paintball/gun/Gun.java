@@ -19,6 +19,8 @@ public class Gun {
     
     private List<ShotRequirement> shotRequirements;
     
+    private List<GunListener> listeners;
+    
     private List<LaunchHandler> launchHandlers;
     private List<ScopeHandler> scopeHandlers;
     private List<ExpUpdater> expUpdaters;
@@ -36,6 +38,7 @@ public class Gun {
         this.initialVelocityDeterminer = initialVelocityDeterminer;
         
         shotRequirements = new ArrayList<>();
+        listeners = new ArrayList<>();
         launchHandlers = new ArrayList<>();
         scopeHandlers = new ArrayList<>();
         expUpdaters = new ArrayList<>();
@@ -57,6 +60,23 @@ public class Gun {
     
     public String getTag() {
         return tag;
+    }
+    
+    public void addListener(GunListener listener) {
+        listener.register(this);
+        listeners.add(listener);
+    }
+    
+    public void onEnable() {
+        for (GunListener listener : listeners) {
+            listener.enable();
+        }
+    }
+    
+    public void onDisable() {
+        for (GunListener listener : listeners) {
+            listener.cleanup();
+        }
     }
     
     public void addShotRequirement(ShotRequirement requirement) {

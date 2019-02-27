@@ -5,6 +5,7 @@ import net.mutinies.arcadecore.cooldown.CooldownManager;
 import net.mutinies.arcadecore.game.projectile.ListeningProjectile;
 import net.mutinies.arcadecore.games.paintball.gun.Gun;
 import net.mutinies.arcadecore.games.paintball.gun.event.ExpUpdater;
+import net.mutinies.arcadecore.games.paintball.gun.event.GunListener;
 import net.mutinies.arcadecore.games.paintball.gun.event.LaunchHandler;
 import net.mutinies.arcadecore.games.paintball.gun.event.ShotRequirement;
 import org.bukkit.entity.Player;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class OverheatingModule implements LaunchHandler, ExpUpdater, ShotRequirement {
+public class OverheatingModule implements LaunchHandler, ExpUpdater, ShotRequirement, GunListener {
     private String cooldownTag;
     private double maxExp;
     private long cooldownDelay;
@@ -28,7 +29,23 @@ public class OverheatingModule implements LaunchHandler, ExpUpdater, ShotRequire
         this.cooldownDelay = cooldownDelay;
         this.shotHeatIncrease = shotHeatIncrease;
         this.cooldownTickDecrease = cooldownTickDecrease;
+    }
+    
+    @Override
+    public void register(Gun gun) {
+        gun.addShotRequirement(this);
+        gun.addLaunchHandler(this);
+        gun.addExpUpdater(this);
+    }
+    
+    @Override
+    public void enable() {
         expMap = new HashMap<>();
+    }
+    
+    @Override
+    public void cleanup() {
+        expMap = null;
     }
     
     @Override

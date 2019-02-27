@@ -5,6 +5,7 @@ import net.mutinies.arcadecore.game.projectile.ListeningProjectile;
 import net.mutinies.arcadecore.game.projectile.ProjectileDamageHandler;
 import net.mutinies.arcadecore.game.projectile.ProjectileHitHandler;
 import net.mutinies.arcadecore.games.paintball.gun.Gun;
+import net.mutinies.arcadecore.games.paintball.gun.event.GunListener;
 import net.mutinies.arcadecore.games.paintball.gun.event.LaunchHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,9 +16,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ConsecutiveHitCounter implements LaunchHandler, ProjectileDamageHandler, ProjectileHitHandler {
+public class ConsecutiveHitCounter implements LaunchHandler, ProjectileDamageHandler, ProjectileHitHandler, GunListener {
     private Map<UUID, Integer> hitMap = new HashMap<>();
     private Map<UUID, ListeningProjectile> lastBulletMap = new HashMap<>();
+    
+    @Override
+    public void register(Gun gun) {
+        gun.addLaunchHandler(this);
+        gun.addLaunchHandler((gun1, player, projectile) -> projectile.addDamageHandler(this));
+        gun.addLaunchHandler((gun1, player, projectile) -> projectile.addHitHandler(this));
+    }
+    
+    @Override
+    public void enable() {
+        hitMap = new HashMap<>();
+        lastBulletMap = new HashMap<>();
+    }
+    
+    @Override
+    public void cleanup() {
+        lastBulletMap = null;
+        hitMap = null;
+    }
     
     @Override
     public void onProjectileDamage(ListeningProjectile projectile, EntityDamageByEntityEvent damageByEntityEvent) {

@@ -73,18 +73,12 @@ public class GameMaker {
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         
         Gun machineGun = new Gun("machine_gun", "Machine Gun", "gun_machine_gun", 150, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(2.4, .25));
-        OverheatingModule overheatingModule = new OverheatingModule("machine_gun_heating", .97, 250, 0.025, 0.020);
-        machineGun.addShotRequirement(overheatingModule);
-        machineGun.addLaunchHandler(overheatingModule);
-        machineGun.addExpUpdater(overheatingModule);
+        machineGun.addListener(new OverheatingModule("machine_gun_heating", .97, 250, 0.025, 0.020));
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         
         Gun sniper = new Gun("sniper", "Sniper", "gun_sniper", 1400, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         sniper.addScopeHandler(new FreezeWhenScopedHandler());
-        ChargingScope scope = new ChargingScope(1000, 1, 4, 1);
-        sniper.addScopeHandler(scope);
-        sniper.addLaunchHandler(scope);
-        sniper.addExpUpdater(scope);
+        sniper.addListener(new ChargingScope(1000, 1, 4, 1));
         
         Gun bazooka = new Gun("bazooka", "Bazooka", "gun_bazooka", 5000, ProjectileType.FIREBALL, 1, new StaticInitialVelocityDeterminer(.8));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new AccelerationHandler())));
@@ -92,10 +86,8 @@ public class GameMaker {
         
         Gun needler = new Gun("needler", "Needler", "gun_needler", 500, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         ConsecutiveHitCounter needlerHitCounter = new ConsecutiveHitCounter();
-        needler.addLaunchHandler(((gun, player, projectile) -> {
-            projectile.addDamageHandler(needlerHitCounter);
-            projectile.addHitHandler(needlerHitCounter);
-        }));
+        needler.addListener(needlerHitCounter);
+        
         needler.addLaunchHandler(((gun, player, projectile) -> {
             int hits = needlerHitCounter.getNumConsectuveHits(player);
             if (hits > 0 && hits % 3 == 0) {

@@ -40,6 +40,7 @@ public class GunModule implements Module {
                 clickEvent.setCancelled(true);
                 gunTagToGunMap.get(tag).shoot(clickEvent.getPlayer());
             });
+            gunTagToGunMap.get(tag).onEnable();
         }
 
         expTask = Bukkit.getScheduler().runTaskTimer(ArcadeCorePlugin.getInstance(), this::updateExps, 1, 1);
@@ -54,6 +55,7 @@ public class GunModule implements Module {
         
         for (String tag : gunTagToGunMap.keySet()) {
             managerHandler.getManager(ItemManager.class).unregister(tag);
+            gunTagToGunMap.get(tag).onDisable();
         }
     }
     

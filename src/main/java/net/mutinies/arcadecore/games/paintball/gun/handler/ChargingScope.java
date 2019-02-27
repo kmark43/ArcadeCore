@@ -2,6 +2,7 @@ package net.mutinies.arcadecore.games.paintball.gun.handler;
 
 import net.mutinies.arcadecore.game.projectile.ListeningProjectile;
 import net.mutinies.arcadecore.games.paintball.gun.Gun;
+import net.mutinies.arcadecore.games.paintball.gun.event.GunListener;
 import net.mutinies.arcadecore.games.paintball.gun.event.ExpUpdater;
 import net.mutinies.arcadecore.games.paintball.gun.event.LaunchHandler;
 import net.mutinies.arcadecore.games.paintball.gun.event.ScopeHandler;
@@ -11,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ChargingScope implements ScopeHandler, LaunchHandler, ExpUpdater {
+public class ChargingScope implements ScopeHandler, LaunchHandler, ExpUpdater, GunListener {
     private long chargeTime;
     private int minScopeDamage;
     private int maxScopeDamage;
@@ -24,7 +25,23 @@ public class ChargingScope implements ScopeHandler, LaunchHandler, ExpUpdater {
         this.minScopeDamage = minScopeDamage;
         this.maxScopeDamage = maxScopeDamage;
         this.unscopedDamage = unscopedDamage;
+    }
+    
+    @Override
+    public void register(Gun gun) {
+        gun.addScopeHandler(this);
+        gun.addLaunchHandler(this);
+        gun.addExpUpdater(this);
+    }
+    
+    @Override
+    public void enable() {
         scopeMap = new HashMap<>();
+    }
+    
+    @Override
+    public void cleanup() {
+        scopeMap = null;
     }
     
     @Override
