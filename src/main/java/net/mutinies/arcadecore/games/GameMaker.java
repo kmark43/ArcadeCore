@@ -51,6 +51,8 @@ public class GameMaker {
         paintball.setEndHandler(new TeamEliminationModule(paintball, true));
         
         paintball.getModuleManager().addModules(ModuleUtil.getPvpList());
+        paintball.getConfigManager().getProperty("show_enemy_nametags").setDefaultValue(false);
+        paintball.getConfigManager().getProperty("show_enemy_nametags").setValue(false);
     
         GunModule gunModule = new GunModule(paintball);
         ReviveModule reviveModule = new ReviveModule(paintball);

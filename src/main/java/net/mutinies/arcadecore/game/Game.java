@@ -1,5 +1,6 @@
 package net.mutinies.arcadecore.game;
 
+import net.mutinies.arcadecore.game.config.ConfigManager;
 import net.mutinies.arcadecore.game.damage.DamageManager;
 import net.mutinies.arcadecore.game.damage.DefaultDamageManager;
 import net.mutinies.arcadecore.game.kit.DefaultKitManager;
@@ -22,6 +23,7 @@ public class Game {
     private int minPlayers;
     private int maxPlayers;
     
+    private ConfigManager configManager;
     private KitManager kitManager;
     private TeamManager teamManager;
     private MapManager mapManager;
@@ -44,7 +46,8 @@ public class Game {
         
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
-        
+    
+        configManager = new ConfigManager(this);
         kitManager = new DefaultKitManager(this);
         teamManager = new TeamManager(this);
         mapManager = new MapManager(this);
@@ -75,6 +78,10 @@ public class Game {
     
     public int getMaxPlayers() {
         return maxPlayers;
+    }
+    
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
     
     public KitManager getKitManager() {

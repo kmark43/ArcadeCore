@@ -1,10 +1,13 @@
 package net.mutinies.arcadecore.game.team;
 
 import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.game.config.ConfigProperty;
+import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.util.MutiniesColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -25,7 +28,7 @@ public class TeamManager implements Module {
         teams = new ArrayList<>();
     
         createTeam("players", "Players", MutiniesColor.PURPLE);
-        
+    
         createTeam("red", "Red", MutiniesColor.RED);
         createTeam("blue", "Blue", MutiniesColor.BLUE);
         createTeam("green", "Green", MutiniesColor.GREEN);
@@ -34,6 +37,10 @@ public class TeamManager implements Module {
         createTeam("aqua", "Aqua", MutiniesColor.AQUA);
         createTeam("lime", "Lime", MutiniesColor.LIME);
         createTeam("yellow", "Yellow", MutiniesColor.YELLOW);
+        
+//        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.BOOLEAN, "friendly_fire", false));
+        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.BOOLEAN, "show_enemy_nametags", true));
+        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.BOOLEAN, "show_ally_nametags", true));
     }
     
     @Override
@@ -51,6 +58,17 @@ public class TeamManager implements Module {
                 for (String entry : entries) {
                     scoreboard.getTeam(team.getName()).removeEntry(entry);
                 }
+            }
+            
+            boolean showEnemyNametags = (boolean)game.getConfigManager().getProperty("show_enemy_nametags").getValue();
+            boolean showAllyNametags = (boolean)game.getConfigManager().getProperty("show_ally_nametags").getValue();
+            
+            if (showAllyNametags && !showEnemyNametags) {
+                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
+            } else if (!showAllyNametags && showEnemyNametags) {
+                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
+            } else if (!showAllyNametags && !showEnemyNametags) {
+                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.NEVER);
             }
         }
     }
