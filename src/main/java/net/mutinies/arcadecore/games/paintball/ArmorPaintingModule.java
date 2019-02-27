@@ -1,5 +1,6 @@
 package net.mutinies.arcadecore.games.paintball;
 
+import net.mutinies.arcadecore.event.PlayerHealthChangeEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
@@ -7,8 +8,6 @@ import org.bukkit.Color;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
@@ -26,11 +25,8 @@ public class ArmorPaintingModule implements Module {
     }
     
     @EventHandler(priority = EventPriority.HIGH)
-    public void onProjectileDamage(EntityDamageByEntityEvent e) {
-        if (!(e.getEntity() instanceof Player)) return;
-        if (e.getCause() != EntityDamageEvent.DamageCause.PROJECTILE) return;
-        Player player = (Player) e.getEntity();
-        updateArmor(player);
+    public void onProjectileDamage(PlayerHealthChangeEvent e) {
+        updateArmor(e.getPlayer());
     }
     
     private int getExpectedArmorPiecesPainted(Player player) {

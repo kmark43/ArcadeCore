@@ -1,6 +1,7 @@
 package net.mutinies.arcadecore.event;
 
 import net.mutinies.arcadecore.game.damage.DamageInstance;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -16,12 +17,14 @@ public class GameDeathEvent extends Event {
     private Player killed;
     private Entity killer;
     private String deathMessage;
+    private Location deathLocation;
     private List<DamageInstance> causes;
 
-    public GameDeathEvent(Player killed, Entity killer, String deathMessage, LinkedList<DamageInstance> causes) {
+    public GameDeathEvent(Player killed, Entity killer, String deathMessage, Location deathLocation, LinkedList<DamageInstance> causes) {
         this.killed = killed;
         this.killer = killer;
         this.deathMessage = deathMessage;
+        this.deathLocation = deathLocation;
         this.causes = new ArrayList<>(causes);
     }
 
@@ -36,7 +39,11 @@ public class GameDeathEvent extends Event {
     public String getDeathMessage() {
         return deathMessage;
     }
-
+    
+    public Location getDeathLocation() {
+        return deathLocation;
+    }
+    
     public List<DamageInstance> getCauses() {
         return causes;
     }

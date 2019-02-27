@@ -33,8 +33,8 @@ public interface DamageManager extends Module {
      */
     
 //    void kill(Player player);
-    //    void setHealth(Player player);
     boolean isAlive(Player player);
     void respawn(Player player);
+    void setHealth(Player player, double health);
     void damage(Player player, double damage, Entity damager, EntityDamageEvent.DamageCause cause);
 }

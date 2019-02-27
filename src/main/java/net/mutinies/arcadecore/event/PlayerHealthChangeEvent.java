@@ -4,30 +4,36 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class GameRespawnEvent extends Event {
+public class PlayerHealthChangeEvent extends Event {
     private static HandlerList handlerList = new HandlerList();
-
+    
     private Player player;
-//    private Location respawnLocation;
-
-    public GameRespawnEvent(Player player) {//, Location respawnLocation) {
+    private double oldHealth;
+    private double newHealth;
+    
+    public PlayerHealthChangeEvent(Player player, double oldHealth, double newHealth) {
         this.player = player;
-//        this.respawnLocation = respawnLocation;
+        this.oldHealth = oldHealth;
+        this.newHealth = newHealth;
     }
-
+    
     public Player getPlayer() {
         return player;
     }
-
-//    public Location getRespawnLocation() {
-//        return respawnLocation;
-//    }
-
+    
+    public double getOldHealth() {
+        return oldHealth;
+    }
+    
+    public double getNewHealth() {
+        return newHealth;
+    }
+    
     @Override
     public HandlerList getHandlers() {
         return handlerList;
     }
-
+    
     public static HandlerList getHandlerList() {
         return handlerList;
     }

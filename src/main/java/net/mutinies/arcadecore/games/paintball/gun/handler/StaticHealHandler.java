@@ -25,7 +25,7 @@ public class StaticHealHandler implements ProjectileDamageHandler {
             GameTeam shooterTeam = game.getTeamManager().getTeam(shooter);
             if (shooterTeam.equals(playerTeam)) {
                 damageByEntityEvent.setCancelled(true);
-                // todo heal
+//                game.getDamageManager().setHealth(player, player.getHealth() + );
             }
         }
     }

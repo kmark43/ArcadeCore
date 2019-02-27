@@ -2,11 +2,14 @@ package net.mutinies.arcadecore.game.damage;
 
 import net.mutinies.arcadecore.event.GameDeathEvent;
 import net.mutinies.arcadecore.event.GamePreDeathEvent;
+import net.mutinies.arcadecore.event.GameRespawnEvent;
+import net.mutinies.arcadecore.event.PlayerHealthChangeEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.EntityEffect;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -50,6 +53,33 @@ public class DefaultDamageManager implements DamageManager {
     @Override
     public void respawn(Player player) {
         // todo custom respawn handlers, make one to respawn where you died with same inv, at a random spawn, etc
+        double oldHealth = player.getHealth();
+        if (!isAlive(player)) {
+            deadPlayers.remove(player.getUniqueId());
+            game.getSpectateManager().unspectatePlayer(player);
+            oldHealth = 0;
+        }
+        player.setHealth(player.getMaxHealth());
+        damageTracking.remove(player.getUniqueId());
+        Bukkit.getPluginManager().callEvent(new GameRespawnEvent(player));
+        Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, oldHealth, player.getHealth()));
+    }
+    
+    @Override
+    public void setHealth(Player player, double health) {
+        if (!isAlive(player)) {
+            deadPlayers.remove(player.getUniqueId());
+            game.getSpectateManager().unspectatePlayer(player);
+        }
+        double oldHealth = player.getHealth();
+        if (health <= 0) {
+            health = 0;
+            handleDeath(player);
+        } else if (health >= player.getMaxHealth()) {
+            health = player.getMaxHealth();
+            player.setHealth(health);
+        }
+        Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, oldHealth, health));
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -102,6 +132,7 @@ public class DefaultDamageManager implements DamageManager {
         
         if (e.getDamage() >= player.getHealth()) {
             e.setCancelled(true);
+            Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, player.getHealth(), 0));
             handleDeath(player);
         }
     }
@@ -142,6 +173,7 @@ public class DefaultDamageManager implements DamageManager {
     }
     
     private void applyDamage(Player player, double damage) {
+        double oldHealth = player.getHealth();
         double newHealth = Math.min(20, Math.max(player.getHealth() - damage, 0));
         
         if (newHealth <= 0) {
@@ -149,12 +181,15 @@ public class DefaultDamageManager implements DamageManager {
         } else if (newHealth <= 20) {
             player.setHealth(newHealth);
         }
+    
+        Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, oldHealth, newHealth));
     }
     
     private void handleDeath(Player player) {
+        Location deathLocation = player.getLocation();
+        
         deadPlayers.add(player.getUniqueId());
         game.getSpectateManager().spectatePlayer(player);
-    
     
         LinkedList<DamageInstance> damageInstances = damageTracking.get(player.getUniqueId());
         DamageInstance lastDamage = damageInstances == null || damageInstances.isEmpty() ? null : damageInstances.getFirst();
@@ -171,7 +206,7 @@ public class DefaultDamageManager implements DamageManager {
             Bukkit.broadcastMessage(MessageUtil.formatMessage("Death", preDeathEvent.getDeathMessage()));
         }
     
-        GameDeathEvent deathEvent = new GameDeathEvent(player, getLastDamager(player), getDeathMessage(player), damageTracking.get(player.getUniqueId()));
+        GameDeathEvent deathEvent = new GameDeathEvent(player, getLastDamager(player), getDeathMessage(player), deathLocation, damageTracking.get(player.getUniqueId()));
         Bukkit.getPluginManager().callEvent(deathEvent);
     }
     
