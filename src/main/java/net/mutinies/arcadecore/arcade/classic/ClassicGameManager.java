@@ -156,7 +156,7 @@ public class ClassicGameManager implements GameManager {
             stopCountdown();
             scoreboardManager.setTitle(ChatColor.BOLD + "Waiting for players");
         } else if (countdownTask == null && numPlayers >= 2) {
-            timeLeft = 21;
+            timeLeft = ArcadeCorePlugin.getInstance().getConfig().getInt("countdownTime") + 1;
             if (getMap() == null) {
                 chooseRandomMap();
             }

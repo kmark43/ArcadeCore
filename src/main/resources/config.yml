@@ -3,3 +3,7 @@ arcadeMode: NoLobby
 
 # Used in Classic Mode
 defaultGame: paintball
+countdownTime: 20
+
+freezeDelay: 6
+endDelay: 6

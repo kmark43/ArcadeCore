@@ -106,8 +106,7 @@ public class GameStateManager {
                 game.getMapManager().clearMap();
                 break;
             case STARTING:
-                // todo make 6, 3 for quicker debugging
-                int startDelay = 3; // todo change to config
+                int freezeDelay = ArcadeCorePlugin.getInstance().getConfig().getInt("freezeDelay");
                 setPlayerStartingStates();
                 enableModules(generalModules);
                 enableModules(startModules);
@@ -115,7 +114,7 @@ public class GameStateManager {
                 game.getKitManager().setDefaultKits();
                 teleportPlayersToGame();
                 game.getKitManager().giveKitSelectionItems();
-                changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.RUNNING), 20 * startDelay);
+                changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.RUNNING), 20 * freezeDelay);
                 break;
             case RUNNING:
                 Bukkit.getOnlinePlayers().forEach(PlayerUtil::setDefaultPlayerState);
@@ -127,7 +126,7 @@ public class GameStateManager {
                 enableModules(Arrays.asList(game.getEndHandler()));
                 break;
             case ENDING:
-                int endDelay = 1;// todo make 5, 1 for quicker debugging
+                int endDelay = ArcadeCorePlugin.getInstance().getConfig().getInt("endDelay");
                 enableModules(endingModules);
                 game.getEndHandler().onWin(game);
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.NOT_ACTIVE), 20 * endDelay);
