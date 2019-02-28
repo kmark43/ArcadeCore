@@ -58,7 +58,7 @@ public class OverheatingModule implements LaunchHandler, ExpUpdater, ShotRequire
         if (!expMap.containsKey(player.getUniqueId())) {
             expMap.put(player.getUniqueId(), 0d);
         }
-        CooldownManager cooldownManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(CooldownManager.class);
+        CooldownManager cooldownManager = ArcadeCorePlugin.getManagerHandler().getManager(CooldownManager.class);
         cooldownManager.setCooldown(player, cooldownTag, cooldownDelay);
         expMap.put(player.getUniqueId(), expMap.get(player.getUniqueId()) + shotHeatIncrease);
     }
@@ -72,7 +72,7 @@ public class OverheatingModule implements LaunchHandler, ExpUpdater, ShotRequire
     public float getExp(Player player) {
         UUID uuid = player.getUniqueId();
         if (expMap.containsKey(uuid)) {
-            CooldownManager cooldownManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(CooldownManager.class);
+            CooldownManager cooldownManager = ArcadeCorePlugin.getManagerHandler().getManager(CooldownManager.class);
             if (cooldownManager.isAvailable(player, cooldownTag)) {
                 expMap.put(uuid, Math.max(0, Math.min(1, expMap.get(player.getUniqueId()) - cooldownTickDecrease)));
             }

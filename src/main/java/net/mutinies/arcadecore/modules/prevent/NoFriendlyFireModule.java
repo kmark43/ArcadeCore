@@ -14,7 +14,7 @@ public class NoFriendlyFireModule implements Module {
         if (!(e.getEntity() instanceof Player)) return;
         if (!(e.getDamager() instanceof Player)) return;
         
-        GameManager gameManager = ArcadeCorePlugin.getInstance().getGameManager();
+        GameManager gameManager = ArcadeCorePlugin.getGameManager();
         Game game = gameManager.getGame();
         
         Player player = (Player) e.getEntity();

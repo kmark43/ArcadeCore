@@ -52,7 +52,7 @@ public class ArcadeMap {
         world.setGameRuleValue("doDaylightCycle", "false");
         world.setGameRuleValue("mobGriefing", "false");
         world.setGameRuleValue("keepInventory", "true");
-        WorldWeatherPreventer weatherPreventer = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(WorldWeatherPreventer.class);
+        WorldWeatherPreventer weatherPreventer = ArcadeCorePlugin.getManagerHandler().getManager(WorldWeatherPreventer.class);
         weatherPreventer.registerWorld(worldName);
     }
 
@@ -61,7 +61,7 @@ public class ArcadeMap {
         
         Bukkit.unloadWorld(world, false);
         world = null;
-        WorldWeatherPreventer weatherPreventer = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(WorldWeatherPreventer.class);
+        WorldWeatherPreventer weatherPreventer = ArcadeCorePlugin.getManagerHandler().getManager(WorldWeatherPreventer.class);
         weatherPreventer.unregisterWorld(worldName);
     }
     

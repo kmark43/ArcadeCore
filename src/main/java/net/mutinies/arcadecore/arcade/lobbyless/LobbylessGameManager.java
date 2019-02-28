@@ -5,10 +5,12 @@ import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.api.StartResult;
 import net.mutinies.arcadecore.api.StopResult;
 import net.mutinies.arcadecore.arcade.ArcadeManager;
+import net.mutinies.arcadecore.arcade.participation.ParticipationManager;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.map.MapManager;
 import net.mutinies.arcadecore.manager.Manager;
+import net.mutinies.arcadecore.util.ModuleUtil;
 import net.mutinies.arcadecore.util.PlayerSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
@@ -16,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -23,11 +26,15 @@ import java.util.UUID;
 public class LobbylessGameManager implements GameManager, Manager {
     private boolean running = false;
     private Game game;
+    private ParticipationManager participationManager;
     private Map<UUID, PlayerSnapshot> snapshotMap;
     
     @Override
     public void enable() {
         snapshotMap = new HashMap<>();
+    
+        participationManager = new ParticipationManager(true);
+        ModuleUtil.enableModules(Arrays.asList(participationManager));
         
         GameCommandExecutor gameExecutor = new GameCommandExecutor();
         PluginCommand gameCommand = ArcadeCorePlugin.getInstance().getCommand("game");
@@ -52,7 +59,7 @@ public class LobbylessGameManager implements GameManager, Manager {
         if (gameName == null) {
             this.game = null;
         } else {
-            ArcadeManager arcadeManager = ArcadeCorePlugin.getInstance().getArcadeManager();
+            ArcadeManager arcadeManager = ArcadeCorePlugin.getArcadeManager();
             game = arcadeManager.getGame(gameName);
         }
     }
@@ -79,7 +86,7 @@ public class LobbylessGameManager implements GameManager, Manager {
     
     @Override
     public StartResult startGame(String gameName, String gameMap) {
-        ArcadeManager arcadeManager = ArcadeCorePlugin.getInstance().getArcadeManager();
+        ArcadeManager arcadeManager = ArcadeCorePlugin.getArcadeManager();
         if (running) {
             return StartResult.INVALID_STATE;
         }
@@ -126,6 +133,11 @@ public class LobbylessGameManager implements GameManager, Manager {
             return null;
         }
         return game.getMapManager().getCurrentMap();
+    }
+    
+    @Override
+    public ParticipationManager getParticipationManager() {
+        return participationManager;
     }
     
     @Override

@@ -20,13 +20,13 @@ public class CooldownRequirement implements LaunchHandler, ShotRequirement, ExpU
     
     @Override
     public void onProjectileLaunch(Gun gun, Player player, ListeningProjectile projectile) {
-        CooldownManager cooldownManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(CooldownManager.class);
+        CooldownManager cooldownManager = ArcadeCorePlugin.getManagerHandler().getManager(CooldownManager.class);
         cooldownManager.checkAvailableOrStartCooldown(player, cooldownTag, cooldown);
     }
     
     @Override
     public boolean canShoot(Player player) {
-        CooldownManager cooldownManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(CooldownManager.class);
+        CooldownManager cooldownManager = ArcadeCorePlugin.getManagerHandler().getManager(CooldownManager.class);
         return cooldownManager.isAvailable(player, cooldownTag);
     }
     
@@ -37,7 +37,7 @@ public class CooldownRequirement implements LaunchHandler, ShotRequirement, ExpU
     
     @Override
     public float getExp(Player player) {
-        CooldownManager cooldownManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(CooldownManager.class);
+        CooldownManager cooldownManager = ArcadeCorePlugin.getManagerHandler().getManager(CooldownManager.class);
         int timeLeft = cooldownManager.getTimeLeft(player, cooldownTag);
         return Math.max(0, Math.min(1, ((float)timeLeft) / cooldown));
     }

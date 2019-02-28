@@ -44,7 +44,7 @@ public class GameMaker {
         ItemStack swordStack = new ItemStack(Material.DIAMOND_SWORD);
         testGame.getKitManager().addKit(new BasicKit("test", "test", swordStack, player -> Arrays.asList(swordStack), new TeamArmorGenerator()));
     
-        ArcadeCorePlugin.getInstance().getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), testGame);
+        ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), testGame);
     }
     
     private static void makePaintball() {
@@ -193,7 +193,7 @@ public class GameMaker {
         
         medicKit.addEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, 1, false, false));
 
-        ArcadeCorePlugin.getInstance().getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
+        ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
     }
     
     public static void makeOITQ() {
@@ -203,6 +203,6 @@ public class GameMaker {
         oitq.getKitManager().addKit(new BasicKit("jumper", "Jumper", new ItemStack(Material.STONE_SWORD),
                 player -> Arrays.asList(new ItemStack(Material.STONE_SWORD), ItemBuilder.of(Material.BOW).unbreakable().build())));
         
-        ArcadeCorePlugin.getInstance().getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), oitq);
+        ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), oitq);
     }
 }

@@ -3,6 +3,7 @@ package net.mutinies.arcadecore.arcade;
 import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.api.StartResult;
 import net.mutinies.arcadecore.api.StopResult;
+import net.mutinies.arcadecore.arcade.participation.ParticipationManager;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.map.GameMap;
 
@@ -34,6 +35,11 @@ public class CompetitiveGameManager implements GameManager {
     
     @Override
     public GameMap getMap() {
+        return null;
+    }
+    
+    @Override
+    public ParticipationManager getParticipationManager() {
         return null;
     }
     

@@ -20,7 +20,7 @@ public class StaticHealHandler implements ProjectileDamageHandler {
         if (damageByEntityEvent.getEntity() instanceof Player) {
             Player player = (Player) damageByEntityEvent.getEntity();
             Player shooter = (Player) projectile.getProjectile().getShooter();
-            Game game = ArcadeCorePlugin.getInstance().getGameManager().getGame();
+            Game game = ArcadeCorePlugin.getGame();
             GameTeam playerTeam = game.getTeamManager().getTeam(player);
             GameTeam shooterTeam = game.getTeamManager().getTeam(shooter);
             if (shooterTeam.equals(playerTeam)) {

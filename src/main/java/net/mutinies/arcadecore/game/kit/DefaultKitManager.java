@@ -1,12 +1,12 @@
 package net.mutinies.arcadecore.game.kit;
 
+import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.event.GameRespawnEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.graphics.inventory.InventoryWindow;
 import net.mutinies.arcadecore.graphics.inventory.WindowButton;
 import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.util.ItemBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,7 +61,7 @@ public class DefaultKitManager implements KitManager {
     
     @Override
     public void setDefaultKits() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : ArcadeCorePlugin.getParticipants()) {
             setDefaultKit(player);
         }
     }
@@ -76,7 +76,7 @@ public class DefaultKitManager implements KitManager {
     
     @Override
     public void giveKitSelectionItems() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : ArcadeCorePlugin.getParticipants()) {
             giveKitSelectionItem(player);
         }
     }

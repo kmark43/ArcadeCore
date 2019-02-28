@@ -33,6 +33,7 @@ public class PlayerEliminationModule extends SoloWinHandler implements Module {
     @Override
     public void enable() {
         orderedDeaths = new LinkedHashSet<>();
+        checkWon();
     }
 
     private void checkWon() {

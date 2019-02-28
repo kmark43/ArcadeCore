@@ -38,14 +38,14 @@ public class ReviveModule implements Module {
     
     @Override
     public void enable() {
-        ItemManager itemManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(ItemManager.class);
+        ItemManager itemManager = ArcadeCorePlugin.getManagerHandler().getManager(ItemManager.class);
         itemManager.registerTag("revive_bomb", this::throwRevive);
         armorStandMap = HashBiMap.create();
     }
     
     @Override
     public void disable() {
-        ItemManager itemManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(ItemManager.class);
+        ItemManager itemManager = ArcadeCorePlugin.getManagerHandler().getManager(ItemManager.class);
         itemManager.unregister("revive_bomb");
         for (Entity entity : new ArrayList<>(armorStandMap.keySet())) {
             entity.remove();

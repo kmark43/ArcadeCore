@@ -51,7 +51,7 @@ public class ManagerHandler {
     }
     
     public <T extends Manager> T getManager(Class<T> clazz) {
-        ManagerHandler handler = ArcadeCorePlugin.getInstance().getManagerHandler();
+        ManagerHandler handler = ArcadeCorePlugin.getManagerHandler();
         return clazz.cast(handler.managerMap.get(clazz));
     }
     

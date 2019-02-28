@@ -51,7 +51,7 @@ public class GameTeam {
     }
     
     public Set<Player> getLivingPlayers() {
-        DamageManager damageManager = ArcadeCorePlugin.getInstance().getGameManager().getGame().getDamageManager();
+        DamageManager damageManager = ArcadeCorePlugin.getGame().getDamageManager();
         return players.stream()
                 .filter(uuid -> Bukkit.getPlayer(uuid) != null)
                 .map(Bukkit::getPlayer)

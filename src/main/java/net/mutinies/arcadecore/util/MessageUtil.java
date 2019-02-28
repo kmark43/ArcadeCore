@@ -18,7 +18,7 @@ public class MessageUtil {
     
     public static String getColoredName(Entity entity) {
         ChatColor color = ChatColor.YELLOW;
-        Game game = ArcadeCorePlugin.getInstance().getGameManager().getGame();
+        Game game = ArcadeCorePlugin.getGame();
         
         if (entity instanceof Player) {
             GameTeam team = game.getTeamManager().getTeam((Player) entity);

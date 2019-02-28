@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class GameCommandExecutor implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        GameManager gameManager = ArcadeCorePlugin.getInstance().getGameManager();
+        GameManager gameManager = ArcadeCorePlugin.getGameManager();
         
         switch (args.length) {
             case 1:
@@ -88,7 +88,7 @@ public class GameCommandExecutor implements CommandExecutor, TabCompleter {
     
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        ArcadeManager arcadeManager = ArcadeCorePlugin.getInstance().getArcadeManager();
+        ArcadeManager arcadeManager = ArcadeCorePlugin.getArcadeManager();
         
         List<String> possibilities = new ArrayList<>();
         switch (args.length) {

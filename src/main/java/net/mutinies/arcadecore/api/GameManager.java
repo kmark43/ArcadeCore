@@ -1,5 +1,6 @@
 package net.mutinies.arcadecore.api;
 
+import net.mutinies.arcadecore.arcade.participation.ParticipationManager;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.manager.Manager;
@@ -11,6 +12,7 @@ public interface GameManager extends Manager {
     void setMap(String gameMap);
     void chooseRandomMap();
     GameMap getMap();
+    ParticipationManager getParticipationManager();
     
     default StartResult startGame() {
         if (isGameRunning()) {

@@ -4,6 +4,7 @@ import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.api.StartResult;
 import net.mutinies.arcadecore.api.StopResult;
+import net.mutinies.arcadecore.arcade.participation.ParticipationManager;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.map.LobbyMap;
@@ -35,6 +36,8 @@ public class ClassicGameManager implements GameManager {
     private ScoreboardManager scoreboardManager;
     private Game activeGame;
     private boolean gameRunning;
+    
+    private ParticipationManager participationManager;
     
     private BukkitTask countdownTask;
     private int timeLeft;
@@ -90,6 +93,12 @@ public class ClassicGameManager implements GameManager {
                 new NoHungerChangeModule()
         );
         
+        ArcadeCorePlugin.getInstance().getCommand("spec").setExecutor(new SpecExecutor());
+        ArcadeCorePlugin.getInstance().getCommand("spec").setTabCompleter(new SpecExecutor());
+        
+        this.participationManager = new ParticipationManager(true);
+        ModuleUtil.enableModules(Arrays.asList(participationManager));
+        
         startLobbyState();
     }
     
@@ -104,6 +113,7 @@ public class ClassicGameManager implements GameManager {
             scoreboardManager.disable();
             HandlerList.unregisterAll(scoreboardManager);
         }
+        participationManager = null;
     }
     
     private void startLobbyState() {
@@ -148,9 +158,10 @@ public class ClassicGameManager implements GameManager {
     }
     
     private void updateCountdownTask() {
+        // todo add spectate and unspectate events/listeners that call this
         if (getGame() == null || isGameRunning()) return;
         
-        int numPlayers = Bukkit.getOnlinePlayers().size();
+        int numPlayers = ArcadeCorePlugin.getParticipants().size();
         
         if (countdownTask != null && numPlayers <= 1) {
             stopCountdown();
@@ -215,7 +226,7 @@ public class ClassicGameManager implements GameManager {
             if (getMap() != null) {
                 getGame().getMapManager().clearMap();
             }
-            activeGame = ArcadeCorePlugin.getInstance().getArcadeManager().getGame(gameName);
+            activeGame = ArcadeCorePlugin.getArcadeManager().getGame(gameName);
             chooseRandomMap();
             updateCountdownTask();
             
@@ -246,6 +257,11 @@ public class ClassicGameManager implements GameManager {
     @Override
     public GameMap getMap() {
         return activeGame != null ? activeGame.getMapManager().getCurrentMap() : null;
+    }
+    
+    @Override
+    public ParticipationManager getParticipationManager() {
+        return participationManager;
     }
     
     @Override

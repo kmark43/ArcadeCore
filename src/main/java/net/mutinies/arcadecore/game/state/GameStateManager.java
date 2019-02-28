@@ -102,7 +102,7 @@ public class GameStateManager {
         switch (newState) {
             case NOT_ACTIVE:
                 disableModules(generalModules);
-                ArcadeCorePlugin.getInstance().getGameManager().handleGameStop();
+                ArcadeCorePlugin.getGameManager().handleGameStop();
                 game.getMapManager().clearMap();
                 break;
             case STARTING:
@@ -110,6 +110,11 @@ public class GameStateManager {
                 setPlayerStartingStates();
                 enableModules(generalModules);
                 enableModules(startModules);
+                List<Player> nonParticipants = new ArrayList<>(Bukkit.getOnlinePlayers());
+                nonParticipants.removeAll(ArcadeCorePlugin.getParticipants());
+                for (Player nonParticipant : nonParticipants) {
+                    game.getSpectateManager().spectatePlayer(nonParticipant);
+                }
                 assignTeams();
                 game.getKitManager().setDefaultKits();
                 teleportPlayersToGame();
@@ -117,7 +122,7 @@ public class GameStateManager {
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.RUNNING), 20 * freezeDelay);
                 break;
             case RUNNING:
-                Bukkit.getOnlinePlayers().forEach(PlayerUtil::setDefaultPlayerState);
+                ArcadeCorePlugin.getParticipants().forEach(PlayerUtil::setDefaultPlayerState);
                 teleportPlayersToSpawnpoints();
                 giveKits();
                 enableModules(runningModules);
@@ -144,7 +149,7 @@ public class GameStateManager {
     }
     
     private void setPlayerStartingStates() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : ArcadeCorePlugin.getParticipants()) {
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
             player.setFlying(true);
@@ -206,7 +211,7 @@ public class GameStateManager {
     
     private void giveKits() {
         KitManager kitManager = game.getKitManager();
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : ArcadeCorePlugin.getParticipants()) {
             Kit kit = kitManager.getKit(player);
             if (kit == null) {
                 kitManager.setKit(player, kitManager.getKits().get(0));

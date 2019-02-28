@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 public class TeamArmorGenerator implements ArmorGenerator {
     @Override
     public ItemStack[] getArmor(Player player) {
-        GameTeam team = ArcadeCorePlugin.getInstance().getGameManager().getGame().getTeamManager().getTeam(player);
+        GameTeam team = ArcadeCorePlugin.getGame().getTeamManager().getTeam(player);
         Color color = team.getColor().getColor();
     
         ItemStack[] armor = {

@@ -18,7 +18,7 @@ import java.util.List;
 public class AreaOfEffectDamage implements ProjectileHitHandler {
     @Override
     public void onProjectileHit(ListeningProjectile projectile, ProjectileHitEvent projectileHitEvent) {
-        Game game = ArcadeCorePlugin.getInstance().getGameManager().getGame();
+        Game game = ArcadeCorePlugin.getGameManager().getGame();
         
         for (Entity entity : getNearbyEntities(projectile.getProjectile().getLocation(), 5)) {
             if (entity instanceof Player) {
@@ -34,7 +34,7 @@ public class AreaOfEffectDamage implements ProjectileHitHandler {
             
                 Vector trajectory = getTrajectory(damagee.getLocation(), projectile.getProjectile().getLocation());
                 double damage;
-                double distance = Math.min(damagee.getLocation().distance(((Player) projectile.getProjectile().getShooter()).getLocation()), damagee.getEyeLocation().distance(((Player) projectile.getProjectile().getShooter()).getLocation()));
+                double distance = Math.min(damagee.getLocation().distance(projectile.getProjectile().getLocation()), damagee.getEyeLocation().distance(projectile.getProjectile().getLocation()));
                 if (distance <= 2) {
                     damage = 20;
                 } else if (distance <= 3) {

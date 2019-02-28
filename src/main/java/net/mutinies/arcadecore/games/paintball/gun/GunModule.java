@@ -32,7 +32,7 @@ public class GunModule implements Module {
     
     @Override
     public void enable() {
-        ManagerHandler managerHandler = ArcadeCorePlugin.getInstance().getManagerHandler();
+        ManagerHandler managerHandler = ArcadeCorePlugin.getManagerHandler();
         for (String tag : gunTagToGunMap.keySet()) {
             managerHandler.getManager(ItemManager.class).registerTag(tag, clickEvent -> {
                 if (clickEvent.getClickType() != ClickEvent.ClickType.RIGHT) return;
@@ -51,7 +51,7 @@ public class GunModule implements Module {
         expTask.cancel();
         expTask = null;
         
-        ManagerHandler managerHandler = ArcadeCorePlugin.getInstance().getManagerHandler();
+        ManagerHandler managerHandler = ArcadeCorePlugin.getManagerHandler();
         
         for (String tag : gunTagToGunMap.keySet()) {
             managerHandler.getManager(ItemManager.class).unregister(tag);
@@ -60,7 +60,7 @@ public class GunModule implements Module {
     }
     
     public void registerGun(Gun gun) {
-        ManagerHandler managerHandler = ArcadeCorePlugin.getInstance().getManagerHandler();
+        ManagerHandler managerHandler = ArcadeCorePlugin.getManagerHandler();
         gunTagToGunMap.put(gun.getTag(), gun);
     }
     

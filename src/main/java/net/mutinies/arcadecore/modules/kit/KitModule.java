@@ -21,7 +21,7 @@ public abstract class KitModule implements Module {
     }
     
     protected boolean inGameWithKit(Player player) {
-        Game game = ArcadeCorePlugin.getInstance().getGameManager().getGame();
+        Game game = ArcadeCorePlugin.getGame();
         return !game.getSpectateManager().isSpectator(player) &&
                 kitNames.contains(game.getKitManager().getKit(player).getName());
     }

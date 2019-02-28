@@ -1,5 +1,6 @@
 package net.mutinies.arcadecore.game.team;
 
+import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
@@ -94,7 +95,7 @@ public class TeamManager implements Module {
     }
     
     public void assignTeams(List<GameTeam> assignableTeams) {
-        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        List<Player> players = new ArrayList<>(ArcadeCorePlugin.getParticipants());
         Collections.shuffle(players);
         
         int i = 0;

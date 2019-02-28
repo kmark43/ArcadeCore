@@ -174,7 +174,7 @@ public class InventoryWindow {
     public void show(Player player) {
         Objects.requireNonNull(player);
         player.openInventory(inventory);
-        ArcadeCorePlugin.getInstance().getManagerHandler().getManager(GuiManager.class).registerGui(player, this);
+        ArcadeCorePlugin.getManagerHandler().getManager(GuiManager.class).registerGui(player, this);
     }
     
     public String getInventoryTitle() {

@@ -2,10 +2,12 @@ package net.mutinies.arcadecore;
 
 import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.arcade.ArcadeManager;
-import net.mutinies.arcadecore.arcade.classic.ClassicGameManager;
 import net.mutinies.arcadecore.arcade.CompetitiveGameManager;
+import net.mutinies.arcadecore.arcade.classic.ClassicGameManager;
 import net.mutinies.arcadecore.arcade.lobbyless.LobbylessGameManager;
 import net.mutinies.arcadecore.cooldown.CooldownManager;
+import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.games.GameMaker;
 import net.mutinies.arcadecore.graphics.inventory.GuiManager;
 import net.mutinies.arcadecore.item.ClickEvent;
@@ -13,8 +15,11 @@ import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.manager.ManagerHandler;
 import net.mutinies.arcadecore.weather.WorldWeatherPreventer;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 public class ArcadeCorePlugin extends JavaPlugin implements Listener {
     private static ArcadeCorePlugin instance;
@@ -23,21 +28,37 @@ public class ArcadeCorePlugin extends JavaPlugin implements Listener {
         return instance;
     }
     
+    public static ArcadeManager getArcadeManager() {
+        return instance.arcadeManager;
+    }
+    
+    public static GameManager getGameManager() {
+        return instance.gameManager;
+    }
+    
+    public static Game getGame() {
+        return instance.gameManager.getGame();
+    }
+    
+    public static List<Player> getParticipants() {
+        return instance.gameManager.getParticipationManager().getParticipants();
+    }
+    
+    public static List<Player> getLivingPlayers() {
+        return instance.gameManager.getGame().getTeamManager().getLivingPlayers();
+    }
+    
+    public static List<GameTeam> getLivingTeams() {
+        return instance.gameManager.getGame().getTeamManager().getLivingTeams();
+    }
+    
+    public static ManagerHandler getManagerHandler() {
+        return instance.managerHandler;
+    }
+    
     private ManagerHandler managerHandler;
     private ArcadeManager arcadeManager;
     private GameManager gameManager;
-    
-    public ManagerHandler getManagerHandler() {
-        return managerHandler;
-    }
-    
-    public ArcadeManager getArcadeManager() {
-        return arcadeManager;
-    }
-    
-    public GameManager getGameManager() {
-        return gameManager;
-    }
     
     @Override
     public void onEnable() {
@@ -76,7 +97,7 @@ public class ArcadeCorePlugin extends JavaPlugin implements Listener {
         
         this.arcadeManager = new ArcadeManager();
         
-        ItemManager itemManager = ArcadeCorePlugin.getInstance().getManagerHandler().getManager(ItemManager.class);
+        ItemManager itemManager = ArcadeCorePlugin.getManagerHandler().getManager(ItemManager.class);
         itemManager.registerTag("select_kit", e -> {
             e.setCancelled(true);
             if (e.getClickType() == ClickEvent.ClickType.RIGHT) {

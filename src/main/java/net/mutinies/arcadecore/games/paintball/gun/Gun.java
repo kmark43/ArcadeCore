@@ -128,7 +128,7 @@ public class Gun {
     }
     
     public void shoot(Player player) {
-        Game game = ArcadeCorePlugin.getInstance().getGameManager().getGame();
+        Game game = ArcadeCorePlugin.getGame();
 
         for (ShotRequirement shotRequirement : shotRequirements) {
             if (!shotRequirement.canShoot(player)) {

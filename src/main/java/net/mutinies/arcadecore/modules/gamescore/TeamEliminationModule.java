@@ -31,6 +31,11 @@ public class TeamEliminationModule extends TeamWinHandler implements Module {
         }
     }
     
+    @Override
+    public void enable() {
+        checkWon();
+    }
+    
     private void checkWon() {
         int numWithPlayers = game.getTeamManager().getLivingTeams().size();
 

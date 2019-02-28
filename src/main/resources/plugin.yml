@@ -20,3 +20,5 @@ commands:
     description: Sets the current game game
   game list:
     description: Lists the available game
+  spec:
+    description: Toggles spectator mode
