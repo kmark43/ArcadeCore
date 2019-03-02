@@ -1,5 +1,7 @@
 package net.mutinies.arcadecore.arcade.participation;
 
+import net.mutinies.arcadecore.event.PlayerDisableParticipationEvent;
+import net.mutinies.arcadecore.event.PlayerEnableParticipationEvent;
 import net.mutinies.arcadecore.module.Module;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -51,8 +53,10 @@ public class ParticipationManager implements Module {
     public void setParticipating(Player player, boolean participating) {
         if (participating) {
             participants.add(player.getUniqueId());
+            Bukkit.getPluginManager().callEvent(new PlayerEnableParticipationEvent(player));
         } else {
             participants.remove(player.getUniqueId());
+            Bukkit.getPluginManager().callEvent(new PlayerDisableParticipationEvent(player));
         }
     }
     

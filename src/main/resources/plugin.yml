@@ -22,3 +22,5 @@ commands:
     description: Lists the available game
   spec:
     description: Toggles spectator mode
+  map:
+    description: Sets current game map

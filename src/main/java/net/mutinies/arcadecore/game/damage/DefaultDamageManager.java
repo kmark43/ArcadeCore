@@ -5,7 +5,6 @@ import net.mutinies.arcadecore.event.GamePreDeathEvent;
 import net.mutinies.arcadecore.event.GameRespawnEvent;
 import net.mutinies.arcadecore.event.PlayerHealthChangeEvent;
 import net.mutinies.arcadecore.game.Game;
-import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.EntityEffect;
@@ -85,7 +84,6 @@ public class DefaultDamageManager implements DamageManager {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerDamageByEntity(EntityDamageByEntityEvent e) {
         if (!(e.getEntity() instanceof Player)) return;
-        if (game.getGameStateManager().getState() != GameStateManager.GameState.RUNNING) return;
     
         Entity damager = e.getDamager();
         Entity directDamager = e.getDamager();
@@ -126,11 +124,18 @@ public class DefaultDamageManager implements DamageManager {
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerDamage(EntityDamageEvent e) {
-        if (game.getGameStateManager().getState() != GameStateManager.GameState.RUNNING) return;
         if (!(e.getEntity() instanceof Player)) return;
         Player player = (Player) e.getEntity();
         
-        if (e.getDamage() >= player.getHealth()) {
+        if (!(e instanceof EntityDamageByEntityEvent)) {
+            if (!damageTracking.containsKey(player.getUniqueId())) {
+                damageTracking.put(player.getUniqueId(), new LinkedList<>());
+            }
+    
+            damageTracking.get(e.getEntity().getUniqueId()).addFirst(new DamageInstance(e.getCause(), null));
+        }
+        
+        if (e.getDamage() >= player.getHealth() || e.getCause() == EntityDamageEvent.DamageCause.VOID) {
             e.setCancelled(true);
             Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, player.getHealth(), 0));
             handleDeath(player);

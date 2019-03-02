@@ -5,14 +5,15 @@ import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.api.StartResult;
 import net.mutinies.arcadecore.api.StopResult;
 import net.mutinies.arcadecore.arcade.participation.ParticipationManager;
+import net.mutinies.arcadecore.event.GameSetEvent;
+import net.mutinies.arcadecore.event.PlayerDisableParticipationEvent;
+import net.mutinies.arcadecore.event.PlayerEnableParticipationEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.map.LobbyMap;
 import net.mutinies.arcadecore.game.scoreboard.ScoreboardManager;
 import net.mutinies.arcadecore.module.Module;
-import net.mutinies.arcadecore.modules.prevent.NoBuildModule;
-import net.mutinies.arcadecore.modules.prevent.NoDamageModule;
-import net.mutinies.arcadecore.modules.prevent.NoHungerChangeModule;
+import net.mutinies.arcadecore.modules.prevent.*;
 import net.mutinies.arcadecore.util.ModuleUtil;
 import net.mutinies.arcadecore.util.PlayerUtil;
 import org.bukkit.Bukkit;
@@ -20,6 +21,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
@@ -49,7 +51,9 @@ public class ClassicGameManager implements GameManager {
     @Override
     public void enable() {
         this.scoreboardManager = new ScoreboardManager();
-        Bukkit.getPluginManager().registerEvents(scoreboardManager, ArcadeCorePlugin.getInstance());
+    
+        this.participationManager = new ParticipationManager(true);
+        ModuleUtil.enableModules(Arrays.asList(participationManager));
     
         scoreboardManager.setLineFunction(player -> {
             String kit = getGame() != null && getGame().getKitManager().getKit(player) != null ?
@@ -57,6 +61,10 @@ public class ClassicGameManager implements GameManager {
             String map = getMap() != null ? getMap().getDisplayName() : "None";
         
             List<String> lines = new ArrayList<>();
+            
+            lines.add("");
+            lines.add(ChatColor.BOLD + "Players");
+            lines.add(participationManager.getParticipants().size() + "/" + getGame().getMaxPlayers());
             
             if (kit != null) {
                 lines.add("");
@@ -69,6 +77,8 @@ public class ClassicGameManager implements GameManager {
             lines.add(map);
             return lines;
         });
+    
+        Bukkit.getPluginManager().registerEvents(scoreboardManager, ArcadeCorePlugin.getInstance());
         
         File lobbyMapFile = new File(ArcadeCorePlugin.getInstance().getDataFolder(), "/lobby.json");
         try {
@@ -90,16 +100,21 @@ public class ClassicGameManager implements GameManager {
         lobbyModules = Arrays.asList(
                 new NoDamageModule(),
                 new NoBuildModule(),
-                new NoHungerChangeModule()
+                new NoHungerChangeModule(),
+                new NoInventoryChange(),
+                new NoNaturalChangesModule()
         );
         
         ArcadeCorePlugin.getInstance().getCommand("spec").setExecutor(new SpecExecutor());
         ArcadeCorePlugin.getInstance().getCommand("spec").setTabCompleter(new SpecExecutor());
         
-        this.participationManager = new ParticipationManager(true);
-        ModuleUtil.enableModules(Arrays.asList(participationManager));
+        ArcadeCorePlugin.getInstance().getCommand("game").setExecutor(new GameCommandExecutor());
+        ArcadeCorePlugin.getInstance().getCommand("game").setTabCompleter(new GameCommandExecutor());
         
-        startLobbyState();
+        ArcadeCorePlugin.getInstance().getCommand("map").setExecutor(new MapCommandExecutor());
+        ArcadeCorePlugin.getInstance().getCommand("map").setTabCompleter(new MapCommandExecutor());
+        
+        Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::startLobbyState);
     }
     
     @Override
@@ -215,6 +230,28 @@ public class ClassicGameManager implements GameManager {
         }
     }
     
+    @EventHandler
+    public void onPlayerEnableParticipation(PlayerEnableParticipationEvent e) {
+        if (!isGameRunning()) {
+            Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::updateCountdownTask);
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerDisableParticipation(PlayerDisableParticipationEvent e) {
+        if (!isGameRunning()) {
+            Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::updateCountdownTask);
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent e) {
+        if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            e.setCancelled(true);
+            e.getEntity().teleport(lobbyMap.getMainSpawn().getLocation());
+        }
+    }
+    
     @Override
     public boolean isGameRunning() {
         return gameRunning;
@@ -222,7 +259,8 @@ public class ClassicGameManager implements GameManager {
     
     @Override
     public void setGame(String gameName) {
-        if (!isGameRunning() && (getGame() == null || !getGame().getName().equals(gameName))) {
+        Game oldGame = getGame();
+        if (!isGameRunning() && (oldGame == null || !oldGame.getName().equals(gameName))) {
             if (getMap() != null) {
                 getGame().getMapManager().clearMap();
             }
@@ -233,6 +271,7 @@ public class ClassicGameManager implements GameManager {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 initLobbyPlayer(player);
             }
+            Bukkit.getPluginManager().callEvent(new GameSetEvent(oldGame, activeGame));
         }
     }
     

@@ -6,6 +6,7 @@ import net.mutinies.arcadecore.module.Module;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.material.MaterialData;
@@ -16,13 +17,17 @@ import java.util.Set;
 
 public class PaintBlockModule implements Module {
     private Game game;
+    private double radius;
     
-    public PaintBlockModule(Game game) {
+    public PaintBlockModule(Game game, double radius) {
         this.game = game;
+        this.radius = radius;
     }
     
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent e) {
+        if (e.getEntity() instanceof ThrownPotion) return;
+        
         if (game.getProjectileManager().isRegistered(e.getEntity())) {
             Player shooter = (Player)e.getEntity().getShooter();
             GameTeam shooterTeam = game.getTeamManager().getTeam(shooter);
@@ -31,7 +36,7 @@ public class PaintBlockModule implements Module {
             
             Location loc = e.getEntity().getLocation().clone().add(e.getEntity().getVelocity().normalize().multiply(.1));
     
-            for (Block block : getInRadius(e.getEntity().getLocation(), 2.5d)) {
+            for (Block block : getInRadius(e.getEntity().getLocation(), radius)) {
                 switch (block.getType()) {
                     case CLAY:
                     case HARD_CLAY:

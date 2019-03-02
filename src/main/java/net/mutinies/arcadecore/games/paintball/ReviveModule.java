@@ -105,7 +105,7 @@ public class ReviveModule implements Module {
         
         game.getProjectileManager().registerProjectile(projectile);
         
-        setNumPotions(player, numPotions, slot);
+        setNumPotions(player, slot, numPotions - 1);
         
         player.updateInventory();
     }

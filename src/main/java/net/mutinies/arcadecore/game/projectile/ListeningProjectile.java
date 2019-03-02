@@ -2,6 +2,7 @@ package net.mutinies.arcadecore.game.projectile;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Projectile;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +14,13 @@ public class ListeningProjectile {
     private List<ProjectileHitHandler> projectileHitHandlers;
     private Projectile projectile;
     private Location origin;
+    private Vector initialVelocity;
     private long launchTime;
     
     public ListeningProjectile(Projectile projectile) {
         this.projectile = Objects.requireNonNull(projectile);
         this.origin = projectile.getLocation();
+        this.initialVelocity = projectile.getVelocity();
         this.launchTime = System.currentTimeMillis();
         
         flightHandlers = new ArrayList<>();
@@ -31,6 +34,10 @@ public class ListeningProjectile {
     
     public Location getOrigin() {
         return origin;
+    }
+    
+    public Vector getInitialVelocity() {
+        return initialVelocity;
     }
     
     public long getLaunchTime() {

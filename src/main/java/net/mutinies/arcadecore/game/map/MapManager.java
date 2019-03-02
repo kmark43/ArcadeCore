@@ -1,6 +1,7 @@
 package net.mutinies.arcadecore.game.map;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
+import net.mutinies.arcadecore.event.MapSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import org.bukkit.Bukkit;
 
@@ -77,5 +78,6 @@ public class MapManager {
         } else {
             this.currentMap = null;
         }
+        Bukkit.getPluginManager().callEvent(new MapSetEvent(currentMap));
     }
 }

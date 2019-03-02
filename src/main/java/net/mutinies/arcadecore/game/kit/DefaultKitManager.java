@@ -2,11 +2,13 @@ package net.mutinies.arcadecore.game.kit;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.event.GameRespawnEvent;
+import net.mutinies.arcadecore.event.KitSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.graphics.inventory.InventoryWindow;
 import net.mutinies.arcadecore.graphics.inventory.WindowButton;
 import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.util.ItemBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -102,11 +104,12 @@ public class DefaultKitManager implements KitManager {
                 player.getInventory().setContents(new ItemStack[36]);
                 player.getInventory().setArmorContents(new ItemStack[4]);
                 kit.giveItems(player);
+                kit.giveEffects(player);
                 break;
         }
         
         playerKits.put(player.getUniqueId(), kit);
-        // todo implement per state, make event
+        Bukkit.getPluginManager().callEvent(new KitSetEvent(player, kit));
     }
     
     @Override

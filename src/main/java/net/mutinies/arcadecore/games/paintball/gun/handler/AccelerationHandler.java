@@ -9,7 +9,7 @@ public class AccelerationHandler implements FlightTickHandler {
     public void onFlightTick(ListeningProjectile projectile) {
         Projectile fireball = projectile.getProjectile();
         long delta = (System.currentTimeMillis() - projectile.getLaunchTime()) / 50;
-        fireball.setVelocity(fireball.getVelocity().clone()
+        fireball.setVelocity(projectile.getInitialVelocity().clone()
                 .multiply(Math.pow(1.07, (delta - 5))));
     }
 }
