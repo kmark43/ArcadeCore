@@ -114,6 +114,9 @@ public class ClassicGameManager implements GameManager {
         ArcadeCorePlugin.getInstance().getCommand("map").setExecutor(new MapCommandExecutor());
         ArcadeCorePlugin.getInstance().getCommand("map").setTabCompleter(new MapCommandExecutor());
         
+        ArcadeCorePlugin.getInstance().getCommand("config").setExecutor(new ConfigCommandExecutor());
+        ArcadeCorePlugin.getInstance().getCommand("config").setTabCompleter(new ConfigCommandExecutor());
+        
         Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::startLobbyState);
     }
     
@@ -246,9 +249,11 @@ public class ClassicGameManager implements GameManager {
     
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent e) {
-        if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
-            e.setCancelled(true);
-            e.getEntity().teleport(lobbyMap.getMainSpawn().getLocation());
+        if (!isGameRunning()) {
+            if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                e.setCancelled(true);
+                e.getEntity().teleport(lobbyMap.getMainSpawn().getLocation());
+            }
         }
     }
     

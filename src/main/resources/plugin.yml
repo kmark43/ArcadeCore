@@ -24,3 +24,5 @@ commands:
     description: Toggles spectator mode
   map:
     description: Sets current game map
+  config:
+    description: Change the current game's configuration

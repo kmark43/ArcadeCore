@@ -77,9 +77,11 @@ public class ConfigProperty {
                     value = null;
             }
             
-            for (PropertyConstraint constraint : constraintList) {
-                if (!constraint.isValid(value)) {
-                    return false;
+            if (constraintList != null) {
+                for (PropertyConstraint constraint : constraintList) {
+                    if (!constraint.isValid(value)) {
+                        return false;
+                    }
                 }
             }
             

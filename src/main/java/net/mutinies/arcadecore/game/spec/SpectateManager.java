@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -42,12 +43,14 @@ public class SpectateManager implements Module {
         spectators = null;
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent e) {
         for (UUID spectatorId : spectators) {
             Player spectator = Bukkit.getPlayer(spectatorId);
             e.getPlayer().hidePlayer(spectator);
         }
+        spectatePlayer(e.getPlayer());
+        e.getPlayer().teleport(game.getMapManager().getCurrentMap().getMainSpawn().getLocation());
     }
     
     @EventHandler
