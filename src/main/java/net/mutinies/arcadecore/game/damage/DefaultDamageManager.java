@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -88,6 +89,7 @@ public class DefaultDamageManager implements DamageManager {
         Entity damager = e.getDamager();
         Entity directDamager = e.getDamager();
         Player damagee = (Player) e.getEntity();
+        double effectiveDamage = Math.min(e.getDamage(), damagee.getHealth());
         
         if (damager instanceof Player && game.getSpectateManager().isSpectator((Player) damager)) {
             e.setCancelled(true);
@@ -102,6 +104,12 @@ public class DefaultDamageManager implements DamageManager {
             e.setCancelled(true);
             
             damager = ((LivingEntity) ((Projectile) damager).getShooter());
+            
+            if (damager instanceof Player) {
+                Player pDamager = (Player) damager;
+                pDamager.setLevel(pDamager.getLevel() + (int)effectiveDamage);
+            }
+            
             damageTracking.get(damagee.getUniqueId()).addFirst(new DamageInstance(e.getCause(), damager));
     
             Vector trajectory = directDamager.getVelocity().setY(0).normalize();
@@ -117,6 +125,11 @@ public class DefaultDamageManager implements DamageManager {
 //            damage(damagee, e.getDamage(), damager, e.getCause());
         } else if (damager instanceof TNTPrimed) {
             damager = ((TNTPrimed) damager).getSource();
+        }
+        
+        if (!e.isCancelled() && damager instanceof Player) {
+            Player pDamager = (Player) damager;
+            pDamager.setLevel((int) effectiveDamage);
         }
     
         damageTracking.get(e.getEntity().getUniqueId()).addFirst(new DamageInstance(e.getCause(), damager));
@@ -139,6 +152,14 @@ public class DefaultDamageManager implements DamageManager {
             e.setCancelled(true);
             Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, player.getHealth(), 0));
             handleDeath(player);
+        }
+    }
+    
+    @EventHandler
+    public void onProjectileLaunch(ProjectileLaunchEvent e) {
+        if (e.getEntity().getShooter() instanceof Player) {
+            Player shooter = (Player)e.getEntity().getShooter();
+            shooter.setLevel(0);
         }
     }
     
