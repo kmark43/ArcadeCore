@@ -53,7 +53,7 @@ public class MapManager {
     }
     
     public GameMap getMap(String name) {
-        return mapNameMap.get(name);
+        return mapNameMap.get(name.toLowerCase());
     }
     
     public GameMap getCurrentMap() {
