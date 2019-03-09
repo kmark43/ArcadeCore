@@ -8,6 +8,8 @@ import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.util.MutiniesColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -70,6 +72,8 @@ public class TeamManager implements Module {
                 scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
             } else if (!showAllyNametags && !showEnemyNametags) {
                 scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.NEVER);
+            } else {
+                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.ALWAYS);
             }
         }
     }
@@ -157,5 +161,10 @@ public class TeamManager implements Module {
             players.addAll(team.getLivingPlayers());
         }
         return players;
+    }
+    
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        setTeam(e.getPlayer(), null);
     }
 }

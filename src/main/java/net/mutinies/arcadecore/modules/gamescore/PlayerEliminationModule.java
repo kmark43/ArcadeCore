@@ -49,6 +49,11 @@ public class PlayerEliminationModule extends SoloWinHandler implements Module {
     }
 
     @EventHandler
+    public void onPlayerQuit(GameDeathEvent e) {
+        checkWon();
+    }
+
+    @EventHandler
     public void onPlayerSpawn(GameRespawnEvent e) {
         orderedDeaths.remove(e.getPlayer().getUniqueId());
     }

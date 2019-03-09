@@ -6,6 +6,7 @@ import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,11 @@ public class TeamEliminationModule extends TeamWinHandler implements Module {
         if (numWithPlayers <= 1) {
             game.getGameStateManager().stop();
         }
+    }
+    
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        checkWon();
     }
 
     @EventHandler

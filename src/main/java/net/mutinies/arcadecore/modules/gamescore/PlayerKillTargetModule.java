@@ -55,11 +55,23 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
             incrementScore((Player) e.getKiller());
         }
     }
-
+    
+    @EventHandler
+    public void onPlayerQuit(GameDeathEvent e) {
+        checkEnoughPlayers();
+    }
+    
+    private void checkEnoughPlayers() {
+        if (game.getTeamManager().getLivingPlayers().size() <= 1) {
+            game.getGameStateManager().stop();
+        }
+    }
+    
     @Override
     public void enable() {
         scoreMap = new HashMap<>();
         game.getTeamManager().getLivingPlayers().forEach(player -> scoreMap.put(player.getUniqueId(), 0));
+        checkEnoughPlayers();
     }
 
     @Override
