@@ -3,4 +3,4 @@ target/
 out/
 *.iml
 *.swp
-
+dependency-reduced-pom.xml
