@@ -1,17 +1,17 @@
 package net.mutinies.arcadecore.games.paintball.event;
 
+import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
 import net.mutinies.arcadecore.game.projectile.ListeningProjectile;
-import net.mutinies.arcadecore.game.projectile.ProjectileHitHandler;
+import net.mutinies.arcadecore.game.projectile.ProjectileHitBlockHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class BreakBlockModule implements ProjectileHitHandler {
+public class BreakBlockModule implements ProjectileHitBlockHandler {
     private double radius;
     
     public BreakBlockModule(double radius) {
@@ -19,8 +19,8 @@ public class BreakBlockModule implements ProjectileHitHandler {
     }
     
     @Override
-    public void onProjectileHit(ListeningProjectile projectile, ProjectileHitEvent projectileHitEvent) {
-        for (Block block : getInRadius(projectile.getProjectile().getLocation(), radius)) {
+    public void onProjectileHitBlock(ListeningProjectile projectile, ProjectileHitBlockEvent projectileHitBlockEvent) {
+        for (Block block : getInRadius(projectileHitBlockEvent.getHitBlock().getLocation(), radius)) {
             block.setType(Material.AIR, false);
         }
     }

@@ -13,6 +13,7 @@ import net.mutinies.arcadecore.graphics.inventory.GuiManager;
 import net.mutinies.arcadecore.item.ClickEvent;
 import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.manager.ManagerHandler;
+import net.mutinies.arcadecore.projectilehit.ProjectileBlockHitManager;
 import net.mutinies.arcadecore.weather.WorldWeatherPreventer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -66,7 +67,7 @@ public class ArcadeCorePlugin extends JavaPlugin implements Listener {
         
         instance = this;
         managerHandler = new ManagerHandler();
-        managerHandler.registerAndEnable(this, new GuiManager(), new WorldWeatherPreventer(), new ItemManager(), new CooldownManager());
+        managerHandler.registerAndEnable(this, new GuiManager(), new WorldWeatherPreventer(), new ItemManager(), new CooldownManager(), new ProjectileBlockHitManager());
         
         Bukkit.getPluginManager().registerEvents(this, this);
         

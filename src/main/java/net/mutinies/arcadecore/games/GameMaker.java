@@ -234,7 +234,7 @@ public class GameMaker {
         // Rifle
         Gun rifle = new Gun("rifle", "Rifle", "gun_rifle", 500, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(3, .01));
         rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(15))));
-        rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(3d))));
+        rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(3d))));
         rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(rifle);
         
@@ -252,7 +252,7 @@ public class GameMaker {
         // Shotgun
         Gun shotgun = new Gun("shotgun", "Shotgun", "gun_shotgun", 1400, ProjectileType.PELLET, 8, new StaticInitialVelocityDeterminer(1.5, .4));
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
-        shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(2d))));
+        shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(2d))));
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(shotgun);
         
@@ -272,7 +272,7 @@ public class GameMaker {
         Gun machineGun = new Gun("machine_gun", "Machine Gun", "gun_machine_gun", 150, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(2.4, .25));
         machineGun.addListener(new OverheatingModule("machine_gun_heating", .97, 250, 0.025, 0.020));
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
-        machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(2d))));
+        machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(2d))));
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(machineGun);
         
@@ -291,7 +291,7 @@ public class GameMaker {
         Gun sniper = new Gun("sniper", "Sniper", "gun_sniper", 1400, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         sniper.addScopeHandler(new FreezeWhenScopedHandler());
         sniper.addListener(new ChargingScope(1000, 1, 4, 1));
-        sniper.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(3d))));
+        sniper.addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(3d))));
         sniper.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new DenseParticleHandler())));
         gunModule.registerGun(sniper);
         
@@ -310,7 +310,7 @@ public class GameMaker {
         Gun bazooka = new Gun("bazooka", "Bazooka", "gun_bazooka", 5000, ProjectileType.FIREBALL, 1, new StaticInitialVelocityDeterminer(.8));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new AccelerationHandler())));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new AreaOfEffectDamage())));
-        bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(4d))));
+        bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(4d))));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(bazooka);
         
@@ -329,7 +329,7 @@ public class GameMaker {
         // Needler
         Gun needler = new Gun("needler", "Needler", "gun_needler", 500, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         ConsecutiveHitCounter needlerHitCounter = new ConsecutiveHitCounter();
-        needler.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(3d))));
+        needler.addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(3d))));
         needler.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new DenseParticleHandler())));
         needler.addListener(needlerHitCounter);
         

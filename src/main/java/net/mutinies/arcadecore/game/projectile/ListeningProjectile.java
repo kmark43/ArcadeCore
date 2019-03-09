@@ -12,6 +12,7 @@ public class ListeningProjectile {
     private List<FlightTickHandler> flightHandlers;
     private List<ProjectileDamageHandler> damageHandlers;
     private List<ProjectileHitHandler> projectileHitHandlers;
+    private List<ProjectileHitBlockHandler> projectileHitBlockHandlers;
     private Projectile projectile;
     private Location origin;
     private Vector initialVelocity;
@@ -26,6 +27,7 @@ public class ListeningProjectile {
         flightHandlers = new ArrayList<>();
         damageHandlers = new ArrayList<>();
         projectileHitHandlers = new ArrayList<>();
+        projectileHitBlockHandlers = new ArrayList<>();
     }
     
     public Projectile getProjectile() {
@@ -56,6 +58,10 @@ public class ListeningProjectile {
         return new ArrayList<>(projectileHitHandlers);
     }
     
+    public List<ProjectileHitBlockHandler> getProjectileHitBlockHandlers() {
+        return new ArrayList<>(projectileHitBlockHandlers);
+    }
+    
     public void addFlightHandler(FlightTickHandler flightTickHandler) {
         flightHandlers.add(flightTickHandler);
     }
@@ -66,5 +72,9 @@ public class ListeningProjectile {
     
     public void addHitHandler(ProjectileHitHandler hitHandler) {
         projectileHitHandlers.add(hitHandler);
+    }
+    
+    public void addHitBlockHandler(ProjectileHitBlockHandler hitBlockHandler) {
+        projectileHitBlockHandlers.add(hitBlockHandler);
     }
 }

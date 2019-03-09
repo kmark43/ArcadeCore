@@ -1,14 +1,17 @@
 package net.mutinies.arcadecore.games.paintball;
 
+import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
-import org.bukkit.*;
+import org.bukkit.DyeColor;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 
@@ -25,18 +28,19 @@ public class PaintBlockModule implements Module {
     }
     
     @EventHandler
-    public void onProjectileHit(ProjectileHitEvent e) {
-        if (e.getEntity() instanceof ThrownPotion) return;
+    public void onProjectileHit(ProjectileHitBlockEvent e) {
+        if (e.getProjectile() instanceof ThrownPotion) return;
         
-        if (game.getProjectileManager().isRegistered(e.getEntity())) {
-            Player shooter = (Player)e.getEntity().getShooter();
+        if (game.getProjectileManager().isRegistered(e.getProjectile())) {
+            Player shooter = (Player)e.getProjectile().getShooter();
             GameTeam shooterTeam = game.getTeamManager().getTeam(shooter);
             
             DyeColor dyeColor = shooterTeam.getColor().getDyeColor();
             
-            Location loc = e.getEntity().getLocation().clone().add(e.getEntity().getVelocity().normalize().multiply(.1));
+//            Location loc = e.getProjectile().getLocation().clone().add(e.getProjectile().getVelocity().normalize().multiply(.1));
+            Location loc = e.getHitBlock().getLocation();
     
-            for (Block block : getInRadius(e.getEntity().getLocation(), radius)) {
+            for (Block block : getInRadius(e.getProjectile().getLocation(), radius)) {
                 switch (block.getType()) {
                     case CLAY:
                     case HARD_CLAY:

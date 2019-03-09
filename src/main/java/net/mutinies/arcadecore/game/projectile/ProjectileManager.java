@@ -1,6 +1,7 @@
 package net.mutinies.arcadecore.game.projectile;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
+import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.module.Module;
 import org.bukkit.Bukkit;
@@ -71,6 +72,15 @@ public class ProjectileManager implements Module {
             Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> projectileMap.remove(e.getEntity().getUniqueId()));
         }
         e.getEntity().remove();
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onProjectileHitBlock(ProjectileHitBlockEvent e) {
+        if (projectileMap.containsKey(e.getProjectile().getUniqueId())) {
+            ListeningProjectile projectile = projectileMap.get(e.getProjectile().getUniqueId());
+            projectile.getProjectileHitBlockHandlers().forEach(handler -> handler.onProjectileHitBlock(projectile, e));
+            Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> projectileMap.remove(e.getProjectile().getUniqueId()));
+        }
     }
     
     @EventHandler
