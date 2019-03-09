@@ -42,7 +42,6 @@ public class GameMaker {
         Game testGame = new Game("test", "Test", "T", 2, 16);
     
         testGame.getModuleManager().addModules(ModuleUtil.getPvpList());
-        testGame.getModuleManager().addModules(new NoFriendlyFireModule());
         testGame.setEndHandler(new PlayerEliminationModule(testGame, true));
     
         ItemStack swordStack = ItemBuilder.of(Material.DIAMOND_SWORD).unbreakable().build();
