@@ -77,6 +77,7 @@ public class GameMaker {
         // Rifle
         Gun rifle = new Gun("rifle", "Rifle", "gun_rifle", 500, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(3, .01));
         rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(15))));
+        rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(rifle);
         
         ItemStack rifleStack = ItemManager.tag(ItemBuilder.of(Material.IRON_BARDING).name("" + ChatColor.WHITE + "Rifle").build(), "gun_rifle");
@@ -92,6 +93,7 @@ public class GameMaker {
         // Shotgun
         Gun shotgun = new Gun("shotgun", "Shotgun", "gun_shotgun", 1400, ProjectileType.PELLET, 8, new StaticInitialVelocityDeterminer(1.5, .4));
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
+        shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(shotgun);
         
         ItemStack shotgunStack = ItemManager.tag(ItemBuilder.of(Material.GOLD_BARDING).name("" + ChatColor.WHITE + "Shotgun").build(), "gun_shotgun");
@@ -109,6 +111,7 @@ public class GameMaker {
         Gun machineGun = new Gun("machine_gun", "Machine Gun", "gun_machine_gun", 150, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(2.4, .25));
         machineGun.addListener(new OverheatingModule("machine_gun_heating", .97, 250, 0.025, 0.020));
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
+        machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(machineGun);
         
         ItemStack machineGunStack = ItemManager.tag(ItemBuilder.of(Material.DIAMOND_BARDING).name("" + ChatColor.WHITE + "Machine Gun").build(), "gun_machine_gun");
@@ -124,6 +127,7 @@ public class GameMaker {
         Gun sniper = new Gun("sniper", "Sniper", "gun_sniper", 1400, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         sniper.addScopeHandler(new FreezeWhenScopedHandler());
         sniper.addListener(new ChargingScope(1000, 1, 4, 1));
+        sniper.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new DenseParticleHandler())));
         gunModule.registerGun(sniper);
         
         ItemStack sniperStack = ItemManager.tag(ItemBuilder.of(Material.STONE_HOE).unbreakable().name("" + ChatColor.WHITE + "Sniper").build(), "gun_sniper");
@@ -139,6 +143,7 @@ public class GameMaker {
         Gun bazooka = new Gun("bazooka", "Bazooka", "gun_bazooka", 5000, ProjectileType.FIREBALL, 1, new StaticInitialVelocityDeterminer(.8));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new AccelerationHandler())));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new AreaOfEffectDamage())));
+        bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(bazooka);
         
         ItemStack bazookaStack = ItemManager.tag(ItemBuilder.of(Material.BLAZE_ROD).name("" + ChatColor.WHITE + "Bazooka").build(), "gun_bazooka");
@@ -165,6 +170,8 @@ public class GameMaker {
                 projectile.addDamageHandler(new StaticDamageHandler(5));
             }
         }));
+    
+        needler.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new DenseParticleHandler())));
         
         gunModule.registerGun(needler);
         
@@ -184,6 +191,7 @@ public class GameMaker {
         medic.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         medic.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticHealHandler(5))));
         medic.addLaunchHandler(new TargetChooser(paintball, true, false));
+        medic.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(medic);
         
         ItemStack medicStack = ItemManager.tag(ItemBuilder.of(Material.WOOD_SPADE).unbreakable().name("" + ChatColor.WHITE + "Medic").build(), "gun_medic");
@@ -227,6 +235,7 @@ public class GameMaker {
         Gun rifle = new Gun("rifle", "Rifle", "gun_rifle", 500, ProjectileType.PELLET, 1, new StaticInitialVelocityDeterminer(3, .01));
         rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(15))));
         rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(3d))));
+        rifle.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(rifle);
         
         ItemStack rifleStack = ItemManager.tag(ItemBuilder.of(Material.IRON_BARDING).name("" + ChatColor.WHITE + "Rifle").build(), "gun_rifle");
@@ -244,6 +253,7 @@ public class GameMaker {
         Gun shotgun = new Gun("shotgun", "Shotgun", "gun_shotgun", 1400, ProjectileType.PELLET, 8, new StaticInitialVelocityDeterminer(1.5, .4));
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(2d))));
+        shotgun.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(shotgun);
         
         ItemStack shotgunStack = ItemManager.tag(ItemBuilder.of(Material.GOLD_BARDING).name("" + ChatColor.WHITE + "Shotgun").build(), "gun_shotgun");
@@ -263,6 +273,7 @@ public class GameMaker {
         machineGun.addListener(new OverheatingModule("machine_gun_heating", .97, 250, 0.025, 0.020));
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addDamageHandler(new StaticDamageHandler(5))));
         machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(2d))));
+        machineGun.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(machineGun);
         
         ItemStack machineGunStack = ItemManager.tag(ItemBuilder.of(Material.DIAMOND_BARDING).name("" + ChatColor.WHITE + "Machine Gun").build(), "gun_machine_gun");
@@ -281,6 +292,7 @@ public class GameMaker {
         sniper.addScopeHandler(new FreezeWhenScopedHandler());
         sniper.addListener(new ChargingScope(1000, 1, 4, 1));
         sniper.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(3d))));
+        sniper.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new DenseParticleHandler())));
         gunModule.registerGun(sniper);
         
         ItemStack sniperStack = ItemManager.tag(ItemBuilder.of(Material.STONE_HOE).unbreakable().name("" + ChatColor.WHITE + "Sniper").build(), "gun_sniper");
@@ -299,6 +311,7 @@ public class GameMaker {
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new AccelerationHandler())));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new AreaOfEffectDamage())));
         bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(4d))));
+        bazooka.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new SparceParticleHandler())));
         gunModule.registerGun(bazooka);
         
         ItemStack bazookaStack = ItemManager.tag(ItemBuilder.of(Material.BLAZE_ROD).name("" + ChatColor.WHITE + "Bazooka").build(), "gun_bazooka");
@@ -317,6 +330,7 @@ public class GameMaker {
         Gun needler = new Gun("needler", "Needler", "gun_needler", 500, ProjectileType.ARROW, 1, new StaticInitialVelocityDeterminer(10));
         ConsecutiveHitCounter needlerHitCounter = new ConsecutiveHitCounter();
         needler.addLaunchHandler(((gun, player, projectile) -> projectile.addHitHandler(new BreakBlockModule(3d))));
+        needler.addLaunchHandler(((gun, player, projectile) -> projectile.addFlightHandler(new DenseParticleHandler())));
         needler.addListener(needlerHitCounter);
         
         needler.addLaunchHandler(((gun, player, projectile) -> {
