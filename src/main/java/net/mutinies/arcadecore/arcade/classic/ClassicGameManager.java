@@ -152,13 +152,15 @@ public class ClassicGameManager implements GameManager {
     }
     
     private void initLobbyPlayer(Player player) {
-        if (!player.getWorld().equals(lobbyMap.getWorld())) {
-            player.teleport(lobbyMap.getMainSpawn().getLocation());
-        }
         PlayerUtil.setDefaultPlayerState(player);
         if (getGame() != null) {
             getGame().getKitManager().setDefaultKits();
             getGame().getKitManager().giveKitSelectionItems();
+        }
+        if (!isGameRunning()) {
+            player.teleport(lobbyMap.getMainSpawn().getLocation());
+        } else {
+        
         }
     }
     

@@ -68,9 +68,9 @@ public class ProjectileManager implements Module {
         if (projectileMap.containsKey(e.getEntity().getUniqueId())) {
             ListeningProjectile projectile = projectileMap.get(e.getEntity().getUniqueId());
             projectile.getProjectileHitHandlers().forEach(handler -> handler.onProjectileHit(projectile, e));
-            projectile.getProjectile().remove();
             Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> projectileMap.remove(e.getEntity().getUniqueId()));
         }
+        e.getEntity().remove();
     }
     
     @EventHandler

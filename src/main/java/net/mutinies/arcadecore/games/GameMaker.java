@@ -42,10 +42,13 @@ public class GameMaker {
         Game testGame = new Game("test", "Test", "T", 2, 16);
     
         testGame.getModuleManager().addModules(ModuleUtil.getPvpList());
+        testGame.getModuleManager().addModules(new NoFriendlyFireModule());
         testGame.setEndHandler(new PlayerEliminationModule(testGame, true));
     
         ItemStack swordStack = ItemBuilder.of(Material.DIAMOND_SWORD).unbreakable().build();
-        testGame.getKitManager().addKit(new BasicKit("test", "Test", swordStack, player -> Arrays.asList(swordStack), new TeamArmorGenerator()));
+        ItemStack bowStack = ItemBuilder.of(Material.BOW).unbreakable().build();
+        ItemStack arrowStack = new ItemStack(Material.ARROW, 32);
+        testGame.getKitManager().addKit(new BasicKit("test", "Test", swordStack, player -> Arrays.asList(swordStack, bowStack, arrowStack), new TeamArmorGenerator()));
     
         ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), testGame);
     }
