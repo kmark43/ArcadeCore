@@ -64,7 +64,22 @@ public class PaintBlockModule implements Module {
                         break;
                 }
             }
-            loc.getWorld().playEffect(loc, Effect.STEP_SOUND, Material.STAINED_CLAY.getId() | dyeColor.getWoolData() << 12);
+
+            Location loc2 = loc.clone().add(.5, .5, .5).subtract(e.getProjectile().getVelocity().normalize().multiply(.1));
+
+            MaterialData data = e.getHitBlock().getState().getData();
+            switch (data.getItemType()) {
+                case WOOL:
+                case STAINED_CLAY:
+                case STAINED_GLASS:
+                case STAINED_GLASS_PANE:
+                case CARPET:
+                    loc2.getWorld().playEffect(loc2, Effect.STEP_SOUND, e.getHitBlock().getType().getId() | dyeColor.getWoolData() << 12);
+                    break;
+                default:
+                    loc2.getWorld().playEffect(loc2, Effect.STEP_SOUND, e.getHitBlock().getType().getId());
+                    break;
+            }
         }
     }
     

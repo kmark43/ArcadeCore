@@ -4,10 +4,7 @@ import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.kit.BasicKit;
 import net.mutinies.arcadecore.game.kit.armor.TeamArmorGenerator;
-import net.mutinies.arcadecore.games.paintball.ArmorPaintingModule;
-import net.mutinies.arcadecore.games.paintball.PaintBlockModule;
-import net.mutinies.arcadecore.games.paintball.PaintDeathMessageModule;
-import net.mutinies.arcadecore.games.paintball.ReviveModule;
+import net.mutinies.arcadecore.games.paintball.*;
 import net.mutinies.arcadecore.games.paintball.event.BreakBlockModule;
 import net.mutinies.arcadecore.games.paintball.gun.Gun;
 import net.mutinies.arcadecore.games.paintball.gun.GunModule;
@@ -69,6 +66,7 @@ public class GameMaker {
                 new NoPearlTeleportModule(),
                 new PaintBlockModule(paintball, 2.5),
                 new PaintDeathMessageModule(),
+                new ProjectileOnlyDamage(),
                 new NoFriendlyFireModule(),
                 gunModule,
                 reviveModule,
@@ -224,6 +222,7 @@ public class GameMaker {
                 new NoPearlTeleportModule(),
                 new PaintBlockModule(paintball, 4.5d),
                 new PaintDeathMessageModule(),
+                new ProjectileOnlyDamage(),
                 new NoFriendlyFireModule(),
                 gunModule,
                 reviveModule,
