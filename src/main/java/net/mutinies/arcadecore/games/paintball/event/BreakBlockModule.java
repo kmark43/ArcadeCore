@@ -1,6 +1,7 @@
 package net.mutinies.arcadecore.games.paintball.event;
 
 import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
+import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.projectile.ListeningProjectile;
 import net.mutinies.arcadecore.game.projectile.ProjectileHitBlockHandler;
 import org.bukkit.Location;
@@ -14,7 +15,7 @@ import java.util.Set;
 public class BreakBlockModule implements ProjectileHitBlockHandler {
     private double radius;
     
-    public BreakBlockModule(double radius) {
+    public BreakBlockModule(Game game, double radius) {
         this.radius = radius;
     }
     

@@ -2,6 +2,8 @@ package net.mutinies.arcadecore.games.paintball;
 
 import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
 import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.game.config.ConfigProperty;
+import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
 import org.bukkit.DyeColor;
@@ -20,11 +22,10 @@ import java.util.Set;
 
 public class PaintBlockModule implements Module {
     private Game game;
-    private double radius;
     
     public PaintBlockModule(Game game, double radius) {
         this.game = game;
-        this.radius = radius;
+        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.DOUBLE, "block_paint_radius", radius));
     }
     
     @EventHandler
@@ -37,8 +38,9 @@ public class PaintBlockModule implements Module {
             
             DyeColor dyeColor = shooterTeam.getColor().getDyeColor();
             
-//            Location loc = e.getProjectile().getLocation().clone().add(e.getProjectile().getVelocity().normalize().multiply(.1));
             Location loc = e.getHitBlock().getLocation();
+            
+            double radius = (Double) game.getConfigManager().getProperty("block_paint_radius").getValue();
     
             for (Block block : getInRadius(e.getProjectile().getLocation(), radius)) {
                 switch (block.getType()) {
