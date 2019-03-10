@@ -1,7 +1,10 @@
 package net.mutinies.arcadecore.modules.gamescore;
 
+import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.module.Module;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,15 +27,14 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
             game.getScoreboardManager().setTitle("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + game.getDisplayName());
             game.getScoreboardManager().setLineFunction(player -> {
                 List<String> lines = new ArrayList<>();
-            
-                List<UUID> sorted = scoreMap.keySet().stream()
-                        .filter(uuid -> Bukkit.getPlayer(uuid) != null)
-                        .sorted(Comparator.comparingInt(scoreMap::get).reversed())
-                        .collect(Collectors.toList());
+                
+                List<Player> sorted = getRankedPlayers();
             
                 for (int i = 0; i < Math.min(sorted.size(), 15); i++) {
-                    Player p = Bukkit.getPlayer(sorted.get(i));
-                    int score = scoreMap.get(sorted.get(i));
+                    Player p = sorted.get(i);
+                    if (p == null) continue;
+                    
+                    int score = scoreMap.getOrDefault(sorted.get(i).getUniqueId(), 0);
                     lines.add("" + ChatColor.WHITE + score + " " + ChatColor.GREEN + p.getName());
                 }
                 return lines;
@@ -40,7 +42,22 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
         }
     }
     
+    @Override
+    public void enable() {
+        scoreMap = new HashMap<>();
+        ArcadeCorePlugin.getGameManager().getParticipationManager().getParticipants().forEach(p -> scoreMap.put(p.getUniqueId(), 0));
+    }
+    
+    @Override
+    public void disable() {
+        scoreMap = null;
+    }
+    
     public void incrementScore(Player player) {
+        if (!scoreMap.containsKey(player.getUniqueId())) {
+            scoreMap.put(player.getUniqueId(), 0);
+        }
+        
         int score = scoreMap.get(player.getUniqueId()) + 1;
         scoreMap.put(player.getUniqueId(), score);
 
@@ -48,7 +65,7 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
             game.getGameStateManager().stop();
         }
     }
-
+    
     @EventHandler
     public void onPlayerDeath(GameDeathEvent e) {
         if (e.getKiller() != null && e.getKiller() instanceof Player) {
@@ -62,21 +79,16 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
     }
     
     private void checkEnoughPlayers() {
-        if (game.getTeamManager().getLivingPlayers().size() <= 1) {
+        if (ArcadeCorePlugin.getGameManager().getParticipationManager().getParticipants().size() <= 1) {
             game.getGameStateManager().stop();
         }
     }
     
-    @Override
-    public void enable() {
-        scoreMap = new HashMap<>();
-        game.getTeamManager().getLivingPlayers().forEach(player -> scoreMap.put(player.getUniqueId(), 0));
-        checkEnoughPlayers();
-    }
-
-    @Override
-    public void disable() {
-        scoreMap = null;
+    @EventHandler
+    public void onGameStart(GameStateSetEvent e) {
+        if (e.getNewState() == GameStateManager.GameState.RUNNING) {
+            checkEnoughPlayers();
+        }
     }
 
     @Override

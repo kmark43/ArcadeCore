@@ -1,7 +1,9 @@
 package net.mutinies.arcadecore.modules.gamescore;
 
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
 import org.bukkit.ChatColor;
@@ -34,7 +36,14 @@ public class TeamEliminationModule extends TeamWinHandler implements Module {
     
     @Override
     public void enable() {
-        checkWon();
+    
+    }
+    
+    @EventHandler
+    public void onGameStart(GameStateSetEvent e) {
+        if (e.getNewState() == GameStateManager.GameState.RUNNING) {
+            checkWon();
+        }
     }
     
     private void checkWon() {

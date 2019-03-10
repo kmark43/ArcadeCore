@@ -1,6 +1,7 @@
 package net.mutinies.arcadecore.game.state;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
+import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.kit.Kit;
 import net.mutinies.arcadecore.game.kit.KitManager;
@@ -88,7 +89,6 @@ public class GameStateManager {
                     disableModules(game.getModuleManager().getGameModules());
                     disableModules(getKitModules());
                 }
-                disableModules(Arrays.asList(game.getEndHandler()));
                 break;
             case ENDING:
                 disableModules(game.getModuleManager().getGameModules());
@@ -102,12 +102,14 @@ public class GameStateManager {
         switch (newState) {
             case NOT_ACTIVE:
                 disableModules(generalModules);
+                disableModules(Arrays.asList(game.getEndHandler()));
                 ArcadeCorePlugin.getGameManager().handleGameStop();
                 game.getMapManager().clearMap();
                 break;
             case STARTING:
                 int freezeDelay = ArcadeCorePlugin.getInstance().getConfig().getInt("freezeDelay");
                 setPlayerStartingStates();
+                enableModules(Arrays.asList(game.getEndHandler()));
                 enableModules(generalModules);
                 enableModules(startModules);
                 List<Player> nonParticipants = new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -128,7 +130,6 @@ public class GameStateManager {
                 enableModules(runningModules);
                 enableModules(game.getModuleManager().getGameModules());
                 enableModules(getKitModules());
-                enableModules(Arrays.asList(game.getEndHandler()));
                 break;
             case ENDING:
                 int endDelay = ArcadeCorePlugin.getInstance().getConfig().getInt("endDelay");
@@ -137,6 +138,8 @@ public class GameStateManager {
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.NOT_ACTIVE), 20 * endDelay);
                 break;
         }
+        
+        Bukkit.getPluginManager().callEvent(new GameStateSetEvent(game, oldState, state));
     }
     
     private List<Module> getKitModules() {

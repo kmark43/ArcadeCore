@@ -4,6 +4,10 @@ import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.kit.BasicKit;
 import net.mutinies.arcadecore.game.kit.armor.TeamArmorGenerator;
+import net.mutinies.arcadecore.games.oitq.GiveArrowOnKillModule;
+import net.mutinies.arcadecore.games.oitq.ProjectileLaunchTagger;
+import net.mutinies.arcadecore.games.oitq.event.ArrowBounceHandler;
+import net.mutinies.arcadecore.games.oitq.event.InstantKillHandler;
 import net.mutinies.arcadecore.games.paintball.*;
 import net.mutinies.arcadecore.games.paintball.event.BreakBlockModule;
 import net.mutinies.arcadecore.games.paintball.gun.Gun;
@@ -11,6 +15,8 @@ import net.mutinies.arcadecore.games.paintball.gun.GunModule;
 import net.mutinies.arcadecore.games.paintball.gun.ProjectileType;
 import net.mutinies.arcadecore.games.paintball.gun.handler.*;
 import net.mutinies.arcadecore.item.ItemManager;
+import net.mutinies.arcadecore.modules.DelayedRespawnModule;
+import net.mutinies.arcadecore.modules.KillComboModule;
 import net.mutinies.arcadecore.modules.gamescore.PlayerEliminationModule;
 import net.mutinies.arcadecore.modules.gamescore.PlayerKillTargetModule;
 import net.mutinies.arcadecore.modules.gamescore.TeamEliminationModule;
@@ -18,6 +24,7 @@ import net.mutinies.arcadecore.modules.kit.DoubleJumpModule;
 import net.mutinies.arcadecore.modules.prevent.NoFriendlyFireModule;
 import net.mutinies.arcadecore.modules.prevent.NoPearlTeleportModule;
 import net.mutinies.arcadecore.modules.prevent.NoRegenModule;
+import net.mutinies.arcadecore.modules.prevent.TeleportToRandomSpawnpointOnReviveModule;
 import net.mutinies.arcadecore.util.ItemBuilder;
 import net.mutinies.arcadecore.util.ModuleUtil;
 import org.bukkit.ChatColor;
@@ -33,6 +40,7 @@ public class GameMaker {
         makeTestGame();
         makePaintball();
         makeSpleefPaintball();
+        makeOITQ();
     }
     
     private static void makeTestGame() {
@@ -361,9 +369,52 @@ public class GameMaker {
     public static void makeOITQ() {
         Game oitq = new Game("one_in_the_quiver", "One in the Quiver", "OITQ", 2, 16);
         oitq.setEndHandler(new PlayerKillTargetModule((short) 20, oitq, true));
+    
+        KillComboModule comboModule = new KillComboModule();
+        comboModule.addComboType("TRIPLE KILL", 3);
+        comboModule.addComboType("GODLIKE", 5);
+        comboModule.addComboType("UNSTOPPABLE", 7);
+        comboModule.addComboType("ULTRA KILL", 9);
+        comboModule.addComboType("MONSTER KILL", 11);
+        comboModule.addComboType("MEGA KILL", 13);
+        comboModule.addComboType("PERFECT RUN", 20);
+    
+        ProjectileLaunchTagger launchTagger = new ProjectileLaunchTagger();
+        launchTagger.registerLaunchHandler(((player, projectile) -> projectile.addDamageHandler(new InstantKillHandler())));
+    
+        oitq.getModuleManager().addModules(ModuleUtil.getPvpList());
+        oitq.getModuleManager().addModules(comboModule, launchTagger, new GiveArrowOnKillModule(), new DelayedRespawnModule(5), new TeleportToRandomSpawnpointOnReviveModule());
+    
+        BasicKit jumperKit = new BasicKit("jumper", "Jumper", new ItemStack(Material.IRON_AXE),
+                player -> Arrays.asList(ItemBuilder.of(Material.IRON_AXE).unbreakable().build(),
+                        ItemBuilder.of(Material.BOW).unbreakable().build(),
+                        new ItemStack(Material.ARROW)));
         
-        oitq.getKitManager().addKit(new BasicKit("jumper", "Jumper", new ItemStack(Material.STONE_SWORD),
-                player -> Arrays.asList(new ItemStack(Material.STONE_SWORD), ItemBuilder.of(Material.BOW).unbreakable().build())));
+        jumperKit.addModule(new DoubleJumpModule(.9, .9, true));
+    
+        oitq.getKitManager().addKit(jumperKit);
+    
+        BasicKit brawlerKit = new BasicKit("brawler", "Brawler", new ItemStack(Material.IRON_SWORD),
+                player -> Arrays.asList(ItemBuilder.of(Material.IRON_SWORD).unbreakable().build(),
+                        ItemBuilder.of(Material.BOW).unbreakable().build(),
+                        new ItemStack(Material.ARROW)));
+        
+        oitq.getKitManager().addKit(brawlerKit);
+    
+        BasicKit enchanterKit = new BasicKit("enchanter", "Enchanter", new ItemStack(Material.STONE_SWORD),
+                player -> Arrays.asList(ItemBuilder.of(Material.STONE_SWORD).unbreakable().build(),
+                        ItemBuilder.of(Material.BOW).unbreakable().build(),
+                        new ItemStack(Material.ARROW)));
+        
+        launchTagger.registerLaunchHandler(((player, projectile) -> {
+            if (oitq.getKitManager().getKit(player).getName().equals("enchanter")) {
+                ArrowBounceHandler bounceHandler = new ArrowBounceHandler(2, 1.2f);
+                bounceHandler.addIgnored(player);
+                projectile.addDamageHandler(bounceHandler);
+            }
+        }));
+        
+        oitq.getKitManager().addKit(enchanterKit);
         
         ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), oitq);
     }
