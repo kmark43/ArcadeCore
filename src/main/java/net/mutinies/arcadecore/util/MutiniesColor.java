@@ -5,12 +5,12 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 
 public enum MutiniesColor {
-    RED(ChatColor.DARK_RED, DyeColor.RED, Color.RED),
-    BLUE(ChatColor.DARK_BLUE, DyeColor.BLUE, Color.BLUE),
+    RED(ChatColor.RED, DyeColor.RED, Color.RED),
+    BLUE(ChatColor.BLUE, DyeColor.BLUE, Color.BLUE),
     GREEN(ChatColor.DARK_GREEN, DyeColor.GREEN, Color.GREEN),
     ORANGE(ChatColor.GOLD, DyeColor.ORANGE, Color.ORANGE),
-    PINK(ChatColor.RED, DyeColor.PINK, Color.fromRGB(0xFF6EC7)),
-    AQUA(ChatColor.BLUE, DyeColor.LIGHT_BLUE, Color.AQUA),
+    PINK(ChatColor.LIGHT_PURPLE, DyeColor.PINK, Color.fromRGB(0xFF6EC7)),
+    AQUA(ChatColor.AQUA, DyeColor.LIGHT_BLUE, Color.AQUA),
     LIME(ChatColor.GREEN, DyeColor.LIME, Color.LIME),
     YELLOW(ChatColor.YELLOW, DyeColor.YELLOW, Color.YELLOW),
     WHITE(ChatColor.WHITE, DyeColor.WHITE, Color.WHITE),
