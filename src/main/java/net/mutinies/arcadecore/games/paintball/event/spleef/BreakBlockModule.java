@@ -1,4 +1,4 @@
-package net.mutinies.arcadecore.games.paintball.event;
+package net.mutinies.arcadecore.games.paintball.event.spleef;
 
 import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
 import net.mutinies.arcadecore.game.Game;

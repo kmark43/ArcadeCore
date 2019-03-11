@@ -59,6 +59,7 @@ public class ClassicGameManager implements GameManager {
             String kit = getGame() != null && getGame().getKitManager().getKit(player) != null ?
                     getGame().getKitManager().getKit(player).getDisplayName() : null;
             String map = getMap() != null ? getMap().getDisplayName() : "None";
+            String game = getGame() != null ? getGame().getDisplayName() : "None";
         
             List<String> lines = new ArrayList<>();
             
@@ -75,6 +76,10 @@ public class ClassicGameManager implements GameManager {
             lines.add("");
             lines.add(ChatColor.BOLD + "Map");
             lines.add(map);
+            
+            lines.add("");
+            lines.add(ChatColor.BOLD + "Game");
+            lines.add(game);
             return lines;
         });
     
@@ -210,7 +215,8 @@ public class ClassicGameManager implements GameManager {
     
     private void updateCountdown() {
         timeLeft--;
-        scoreboardManager.setTitle(ChatColor.BOLD + "" + timeLeft + " Seconds Left");
+//        scoreboardManager.setTitle(ChatColor.BOLD + "" + timeLeft + " Seconds Left");
+        scoreboardManager.setTitle(ChatColor.BOLD + "Starting in " + timeLeft + " seconds");
         if (timeLeft <= 0) {
             stopCountdown();
             startGame();

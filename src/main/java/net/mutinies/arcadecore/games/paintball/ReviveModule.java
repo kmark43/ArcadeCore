@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameRespawnEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.projectile.PotionProjectile;
 import net.mutinies.arcadecore.game.team.GameTeam;
@@ -123,6 +124,7 @@ public class ReviveModule implements Module {
                 if (!game.getSpectateManager().isSpectator(target) &&
                         game.getTeamManager().getTeam(player).equals(game.getTeamManager().getTeam(target))) {
                     game.getDamageManager().respawn(target);
+                    Bukkit.getPluginManager().callEvent(new GameReviveEvent(target));
                 }
             } else if (armorStandMap.containsKey(entity)) {
                 target = armorStandMap.get(entity);
@@ -131,17 +133,27 @@ public class ReviveModule implements Module {
                     game.getDamageManager().respawn(target);
                     target.teleport(entity);
                     armorStandMap.remove(entity);
+                    Bukkit.getPluginManager().callEvent(new GameReviveEvent(target));
                 }
             }
         }
     }
     
-    private int getNumPotions(Player player, int slot) {
+    @EventHandler
+    public void onRespawn(GameRespawnEvent e) {
+        Entity entity = armorStandMap.inverse().get(e.getPlayer());
+        if (entity != null) {
+            armorStandMap.inverse().remove(e.getPlayer());
+            entity.remove();
+        }
+    }
+    
+    public int getNumPotions(Player player, int slot) {
         ItemStack stack = player.getInventory().getItem(slot);
         return stack == null || stack.getType() == Material.AIR ? 0 : stack.getAmount();
     }
     
-    private void setNumPotions(Player player, int slot, int numPotions) {
+    public void setNumPotions(Player player, int slot, int numPotions) {
         if (numPotions == 0) {
             player.getInventory().setItem(slot, null);
         } else {

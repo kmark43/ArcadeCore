@@ -58,10 +58,10 @@ public class DefaultDamageManager implements DamageManager {
             deadPlayers.remove(player.getUniqueId());
             game.getSpectateManager().unspectatePlayer(player);
             oldHealth = 0;
+            Bukkit.getPluginManager().callEvent(new GameRespawnEvent(player));
         }
         player.setHealth(player.getMaxHealth());
         damageTracking.remove(player.getUniqueId());
-        Bukkit.getPluginManager().callEvent(new GameRespawnEvent(player));
         Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, oldHealth, player.getHealth()));
     }
     

@@ -3,10 +3,7 @@ package net.mutinies.arcadecore.util;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.modules.MakeKitItemsUnbreakable;
-import net.mutinies.arcadecore.modules.prevent.NoBuildModule;
-import net.mutinies.arcadecore.modules.prevent.NoDamageModule;
-import net.mutinies.arcadecore.modules.prevent.NoHungerChangeModule;
-import net.mutinies.arcadecore.modules.prevent.NoNaturalChangesModule;
+import net.mutinies.arcadecore.modules.prevent.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
@@ -46,6 +43,7 @@ public class ModuleUtil {
         List<Module> list = getVanillaList();
         list.add(new NoBuildModule());
         list.add(new NoHungerChangeModule());
+        list.add(new NoInventoryChange());
         list.add(new MakeKitItemsUnbreakable());
         return list;
     }

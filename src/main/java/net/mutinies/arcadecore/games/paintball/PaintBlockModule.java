@@ -6,11 +6,9 @@ import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
-import org.bukkit.DyeColor;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
@@ -42,7 +40,10 @@ public class PaintBlockModule implements Module {
             
             double radius = (Double) game.getConfigManager().getProperty("block_paint_radius").getValue();
     
-            for (Block block : getInRadius(e.getProjectile().getLocation(), radius)) {
+            Set<Block> blocks = getInRadius(e.getProjectile().getLocation(), radius);
+            Bukkit.getPluginManager().callEvent(new PaintBlocksEvent(blocks));
+            
+            for (Block block : blocks) {
                 switch (block.getType()) {
                     case CLAY:
                     case HARD_CLAY:
@@ -55,7 +56,10 @@ public class PaintBlockModule implements Module {
                         block.setType(Material.STAINED_GLASS_PANE);
                         break;
                 }
-                MaterialData data = block.getState().getData();
+                
+                BlockState state = block.getState();
+                MaterialData data = state.getData();
+                
                 switch (data.getItemType()) {
                     case WOOL:
                     case STAINED_CLAY:

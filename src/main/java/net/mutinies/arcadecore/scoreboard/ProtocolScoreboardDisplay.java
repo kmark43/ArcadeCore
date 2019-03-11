@@ -170,7 +170,8 @@ public class ProtocolScoreboardDisplay implements ScoreboardDisplay {
             int splitIndex = value.charAt(15) == ChatColor.COLOR_CHAR ? 15 : 16;
             prefix = value.substring(0, splitIndex);
             String lastColor = ChatColor.getLastColors(prefix);
-            suffix = lastColor + value.substring(splitIndex, Math.min(value.length(), splitIndex + 16));
+            suffix = lastColor + value.substring(splitIndex);
+            suffix = suffix.substring(0, Math.min(suffix.length(), 16));
         }
         
         teamWrapper.setTeamPrefix(prefix);

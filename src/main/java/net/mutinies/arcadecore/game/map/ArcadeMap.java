@@ -52,6 +52,9 @@ public class ArcadeMap {
         world.setGameRuleValue("doDaylightCycle", "false");
         world.setGameRuleValue("mobGriefing", "false");
         world.setGameRuleValue("keepInventory", "true");
+        world.setTime(6000);
+        world.setThundering(false);
+        world.setStorm(false);
         WorldWeatherPreventer weatherPreventer = ArcadeCorePlugin.getManagerHandler().getManager(WorldWeatherPreventer.class);
         weatherPreventer.registerWorld(worldName);
     }

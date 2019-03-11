@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 public class GameMap extends ArcadeMap {
     private Map<String, List<UnloadedLocation>> teamSpawnpoints;
+    private JsonObject rootObject;
     
     public GameMap(File file) throws FileNotFoundException {
         super(file);
@@ -23,6 +24,7 @@ public class GameMap extends ArcadeMap {
     @Override
     public void parse(JsonObject root) {
         super.parse(root);
+        this.rootObject = root;
         
         teamSpawnpoints = new HashMap<>();
         for (JsonElement teamElement : root.get("teams").getAsJsonArray()) {
@@ -36,6 +38,10 @@ public class GameMap extends ArcadeMap {
             
             teamSpawnpoints.put(teamName, spawnpoints);
         }
+    }
+    
+    public JsonObject getRootObject() {
+        return rootObject;
     }
     
     public List<String> getParsedTeams() {
