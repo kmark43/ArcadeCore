@@ -124,7 +124,7 @@ public class GameStateManager {
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.RUNNING), 20 * freezeDelay);
                 break;
             case RUNNING:
-                ArcadeCorePlugin.getParticipants().forEach(PlayerUtil::setDefaultPlayerState);
+                game.getSpectateManager().getNonspectators().forEach(PlayerUtil::setDefaultPlayerState);
                 teleportPlayersToSpawnpoints();
                 giveKits();
                 enableModules(runningModules);
@@ -214,7 +214,7 @@ public class GameStateManager {
     
     private void giveKits() {
         KitManager kitManager = game.getKitManager();
-        for (Player player : ArcadeCorePlugin.getParticipants()) {
+        for (Player player : game.getSpectateManager().getNonspectators()) {
             Kit kit = kitManager.getKit(player);
             if (kit == null) {
                 kitManager.setKit(player, kitManager.getKits().get(0));

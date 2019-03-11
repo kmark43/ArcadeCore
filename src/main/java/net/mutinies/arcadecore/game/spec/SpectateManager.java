@@ -14,10 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpectateManager implements Module {
     private Game game;
@@ -56,6 +54,10 @@ public class SpectateManager implements Module {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         spectators.remove(e.getPlayer().getUniqueId());
+    }
+    
+    public List<Player> getNonspectators() {
+        return Bukkit.getOnlinePlayers().stream().filter(player -> !isSpectator(player)).collect(Collectors.toList());
     }
     
     public boolean isSpectator(Player player) {
