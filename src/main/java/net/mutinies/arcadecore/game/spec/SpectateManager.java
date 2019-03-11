@@ -1,7 +1,6 @@
 package net.mutinies.arcadecore.game.spec;
 
 import net.mutinies.arcadecore.game.Game;
-import net.mutinies.arcadecore.game.kit.Kit;
 import net.mutinies.arcadecore.module.Module;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -118,7 +117,7 @@ public class SpectateManager implements Module {
         player.setMaxHealth(20);
         player.setHealth(20);
         player.setExp(0);
-        Kit kit = game.getKitManager().getKit(player);
-        kit.giveItems(player);
+//        Kit kit = game.getKitManager().getKit(player);
+//        kit.giveItems(player);
     }
 }

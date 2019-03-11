@@ -144,7 +144,7 @@ public class ClassicGameManager implements GameManager {
         scoreboardManager.setTitle(ChatColor.BOLD + "Waiting for players");
         updateCountdownTask();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            initLobbyPlayer(player);
+            initLobbyPlayer(player, false);
         }
     
         ModuleUtil.enableModules(lobbyModules);
@@ -156,14 +156,16 @@ public class ClassicGameManager implements GameManager {
         scoreboardManager.disable();
     }
     
-    private void initLobbyPlayer(Player player) {
+    private void initLobbyPlayer(Player player, boolean teleport) {
         PlayerUtil.setDefaultPlayerState(player);
         if (getGame() != null) {
             getGame().getKitManager().setDefaultKits();
             getGame().getKitManager().giveKitSelectionItems();
         }
         if (!isGameRunning()) {
-            player.teleport(lobbyMap.getMainSpawn().getLocation());
+            if (teleport) {
+                player.teleport(lobbyMap.getMainSpawn().getLocation());
+            }
         } else {
         
         }
@@ -229,7 +231,7 @@ public class ClassicGameManager implements GameManager {
             e.getPlayer().teleport(getMap().getMainSpawn().getLocation());
             getGame().getSpectateManager().spectatePlayer(e.getPlayer());
         } else {
-            initLobbyPlayer(e.getPlayer());
+            initLobbyPlayer(e.getPlayer(), true);
             updateCountdownTask();
         }
     }
@@ -244,6 +246,7 @@ public class ClassicGameManager implements GameManager {
     @EventHandler
     public void onPlayerEnableParticipation(PlayerEnableParticipationEvent e) {
         if (!isGameRunning()) {
+            initLobbyPlayer(e.getPlayer(), false);
             Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::updateCountdownTask);
         }
     }
@@ -282,7 +285,7 @@ public class ClassicGameManager implements GameManager {
             updateCountdownTask();
             
             for (Player player : Bukkit.getOnlinePlayers()) {
-                initLobbyPlayer(player);
+                initLobbyPlayer(player, false);
             }
             Bukkit.getPluginManager().callEvent(new GameSetEvent(oldGame, activeGame));
         }

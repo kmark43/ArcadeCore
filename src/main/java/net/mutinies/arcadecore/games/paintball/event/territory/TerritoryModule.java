@@ -140,20 +140,38 @@ public class TerritoryModule extends TeamWinHandler {
         } else {
             BukkitTask task = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> {
                 respawnTasks.remove(player.getUniqueId());
-                List<Territory> claimedTerritories = getClaimedTerritories(team);
-                if (!claimedTerritories.isEmpty()) {
-                    Territory territory = claimedTerritories.get((int) (Math.random() * claimedTerritories.size()));
-                    game.getDamageManager().respawn(player);
-                    player.teleport(territory.getCenterLocation().clone().add(0, 1, 0));
-                } else if (team.getLivingPlayers().size() == 0 && game.getTeamManager().getLivingTeams().size() <= 1) {
-                    if (game.getTeamManager().getLivingTeams().size() == 1) {
-                        winner = game.getTeamManager().getLivingTeams().get(0);
-                    }
-                    game.getGameStateManager().stop();
-                }
+                respawnPlayer(player);
             }, (Integer) game.getConfigManager().getProperty("respawn_time").getValue());
     
             respawnTasks.put(player.getUniqueId(), task);
+        }
+    }
+    
+    @EventHandler
+    public void onTerritoryClaim(TerritoryClaimEvent e) {
+        GameTeam team = e.getTeam();
+        Set<UUID> uuids = team.getPlayers();
+        List<Player> players = uuids.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).collect(Collectors.toList());
+        for (Player player : players) {
+            if (!respawnTasks.containsKey(player.getUniqueId()) &&
+                    !game.getDamageManager().isAlive(player)) {
+                respawnPlayer(player);
+            }
+        }
+    }
+    
+    private void respawnPlayer(Player player) {
+        GameTeam team = game.getTeamManager().getTeam(player);
+        List<Territory> claimedTerritories = getClaimedTerritories(team);
+        if (!claimedTerritories.isEmpty()) {
+            Territory territory = claimedTerritories.get((int) (Math.random() * claimedTerritories.size()));
+            game.getDamageManager().respawn(player);
+            player.teleport(territory.getCenterLocation().clone().add(0, 1, 0));
+        } else if (team.getLivingPlayers().size() == 0 && game.getTeamManager().getLivingTeams().size() <= 1) {
+            if (game.getTeamManager().getLivingTeams().size() == 1) {
+                winner = game.getTeamManager().getLivingTeams().get(0);
+            }
+            game.getGameStateManager().stop();
         }
     }
     

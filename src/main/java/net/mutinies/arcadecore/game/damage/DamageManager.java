@@ -5,6 +5,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import java.util.List;
+
 public interface DamageManager extends Module {
     /*
     die if you leave
@@ -37,4 +39,5 @@ public interface DamageManager extends Module {
     void respawn(Player player);
     void setHealth(Player player, double health);
     void damage(Player player, double damage, Entity damager, EntityDamageEvent.DamageCause cause);
+    List<Player> getDeadPlayers();
 }

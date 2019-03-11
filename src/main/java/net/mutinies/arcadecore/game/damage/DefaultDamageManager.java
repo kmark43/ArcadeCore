@@ -19,6 +19,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.mutinies.arcadecore.util.MessageUtil.getColoredName;
 
@@ -80,6 +81,11 @@ public class DefaultDamageManager implements DamageManager {
             player.setHealth(health);
         }
         Bukkit.getPluginManager().callEvent(new PlayerHealthChangeEvent(player, oldHealth, health));
+    }
+    
+    @Override
+    public List<Player> getDeadPlayers() {
+        return deadPlayers.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).collect(Collectors.toList());
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
