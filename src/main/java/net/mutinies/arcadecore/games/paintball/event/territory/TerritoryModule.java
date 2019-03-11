@@ -5,9 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameRespawnEvent;
 import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
 import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.game.config.ConfigProperty;
+import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.games.paintball.PaintBlocksEvent;
@@ -24,7 +27,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -34,8 +36,6 @@ import java.util.stream.Collectors;
 public class TerritoryModule extends TeamWinHandler {
     private Game game;
     private ReviveModule reviveModule;
-    private int targetScore;
-    private int respawnTime;
     
     private Map<String, Integer> scoreMap;
     private List<Territory> territories;
@@ -48,8 +48,8 @@ public class TerritoryModule extends TeamWinHandler {
     public TerritoryModule(Game game, ReviveModule reviveModule, int targetScore, int respawnTime) {
         this.game = game;
         this.reviveModule = reviveModule;
-        this.targetScore = targetScore;
-        this.respawnTime = respawnTime;
+        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.INT, "target_score", targetScore));
+        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.INT, "respawn_time", respawnTime));
         setScoreboardLines();
     }
     
@@ -151,7 +151,7 @@ public class TerritoryModule extends TeamWinHandler {
                     }
                     game.getGameStateManager().stop();
                 }
-            }, respawnTime);
+            }, (Integer) game.getConfigManager().getProperty("respawn_time").getValue());
     
             respawnTasks.put(player.getUniqueId(), task);
         }
@@ -186,7 +186,7 @@ public class TerritoryModule extends TeamWinHandler {
     }
     
     @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent e) {
+    public void onPlayerRespawn(GameRespawnEvent e) {
         cancelRespawn(e.getPlayer());
     }
     
@@ -270,7 +270,7 @@ public class TerritoryModule extends TeamWinHandler {
             score++;
             scoreMap.put(team.getName(), score);
             
-            if (score >= targetScore) {
+            if (score >= (int) game.getConfigManager().getProperty("target_score").getValue()) {
                 winner = team;
                 game.getGameStateManager().stop();
             }
