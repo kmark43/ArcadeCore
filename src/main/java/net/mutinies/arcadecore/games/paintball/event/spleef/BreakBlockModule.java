@@ -7,6 +7,8 @@ import net.mutinies.arcadecore.game.projectile.ProjectileHitBlockHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 
 import java.util.HashSet;
@@ -21,8 +23,23 @@ public class BreakBlockModule implements ProjectileHitBlockHandler {
     
     @Override
     public void onProjectileHitBlock(ListeningProjectile projectile, ProjectileHitBlockEvent projectileHitBlockEvent) {
-        for (Block block : getInRadius(projectileHitBlockEvent.getHitBlock().getLocation(), radius)) {
-            block.setType(Material.AIR, false);
+        Block block = projectileHitBlockEvent.getHitBlock();
+        BlockState state = block.getState();
+        MaterialData data = state.getData();
+        switch (data.getItemType()) {
+            case CLAY:
+            case HARD_CLAY:
+            case GLASS:
+            case THIN_GLASS:
+            case WOOL:
+            case STAINED_CLAY:
+            case STAINED_GLASS:
+            case STAINED_GLASS_PANE:
+            case CARPET:
+                for (Block b : getInRadius(projectileHitBlockEvent.getHitBlock().getLocation(), radius)) {
+                    b.setType(Material.AIR, false);
+                }
+                break;
         }
     }
     
