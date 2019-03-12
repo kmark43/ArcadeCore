@@ -22,6 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.material.MaterialData;
@@ -234,6 +235,7 @@ public class TerritoryModule extends TeamWinHandler {
     
     @EventHandler
     public void onProjectileHitBlock(ProjectileHitBlockEvent e) {
+        if (e.getProjectile() instanceof ThrownPotion) return;
         if (!(e.getProjectile().getShooter() instanceof Player)) return;
         Player shooter = (Player)e.getProjectile().getShooter();
         GameTeam team = game.getTeamManager().getTeam(shooter);
