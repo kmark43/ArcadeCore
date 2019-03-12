@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
@@ -98,7 +97,7 @@ public class SpectateManager implements Module {
         player.setLastDamage(0);
         player.setMaxHealth(20);
         player.setHealth(20);
-        player.getInventory().setContents(new ItemStack[36]);
+//        player.getInventory().setContents(new ItemStack[36]);
         player.teleport(game.getMapManager().getCurrentMap().getMainSpawn().getLocation());
         player.setVelocity(new Vector(0, 0, 0));
         for (PotionEffect effect : new ArrayList<>(player.getActivePotionEffects())) {

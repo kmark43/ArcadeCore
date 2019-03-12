@@ -9,6 +9,7 @@ import net.mutinies.arcadecore.util.MutiniesColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
@@ -145,6 +146,16 @@ public class TeamManager implements Module {
         }
     }
     
+    public List<GameTeam> getTeamsWithPlayers() {
+        List<GameTeam> teams = new ArrayList<>();
+        for (GameTeam team : this.teams) {
+            if (!team.getPlayers().isEmpty()) {
+                teams.add(team);
+            }
+        }
+        return teams;
+    }
+    
     public List<GameTeam> getLivingTeams() {
         List<GameTeam> livingTeams = new ArrayList<>();
         for (GameTeam team : teams) {
@@ -163,7 +174,7 @@ public class TeamManager implements Module {
         return players;
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerQuit(PlayerQuitEvent e) {
         setTeam(e.getPlayer(), null);
     }

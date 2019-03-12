@@ -2,6 +2,7 @@ package net.mutinies.arcadecore.modules.gamescore;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameEndCheckEvent;
 import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.state.GameStateManager;
@@ -63,6 +64,26 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
 
         if (score >= target) {
             game.getGameStateManager().stop();
+        }
+    }
+    
+    @Override
+    public void checkShouldEnd(Game game) {
+        for (int value : scoreMap.values()) {
+            if (value >= target) {
+                GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.SCORE);
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    game.getGameStateManager().stop();
+                }
+            }
+        }
+        if (game.getTeamManager().getLivingPlayers().size() <= 1) {
+            GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.TOO_FEW_ALIVE);
+            Bukkit.getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                game.getGameStateManager().stop();
+            }
         }
     }
     

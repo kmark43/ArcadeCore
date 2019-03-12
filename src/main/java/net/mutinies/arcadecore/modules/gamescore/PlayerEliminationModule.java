@@ -1,6 +1,7 @@
 package net.mutinies.arcadecore.modules.gamescore;
 
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameEndCheckEvent;
 import net.mutinies.arcadecore.event.GameRespawnEvent;
 import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
@@ -40,25 +41,30 @@ public class PlayerEliminationModule extends SoloWinHandler implements Module {
     @EventHandler
     public void onGameStart(GameStateSetEvent e) {
         if (e.getNewState() == GameStateManager.GameState.RUNNING) {
-            checkWon();
+            checkShouldEnd(game);
         }
     }
 
-    private void checkWon() {
+    @Override
+    public void checkShouldEnd(Game game) {
         if (game.getTeamManager().getLivingPlayers().size() <= 1) {
-            game.getGameStateManager().stop();
+            GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.TOO_FEW_ALIVE);
+            Bukkit.getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                game.getGameStateManager().stop();
+            }
         }
     }
 
     @EventHandler
     public void onPlayerDeath(GameDeathEvent e) {
         orderedDeaths.add(e.getKilled().getUniqueId());
-        checkWon();
+        checkShouldEnd(game);
     }
 
     @EventHandler
     public void onPlayerQuit(GameDeathEvent e) {
-        checkWon();
+        checkShouldEnd(game);
     }
 
     @EventHandler

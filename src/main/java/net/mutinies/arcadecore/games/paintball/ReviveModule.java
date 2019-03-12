@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameEndCheckEvent;
 import net.mutinies.arcadecore.event.GameRespawnEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.projectile.PotionProjectile;
@@ -17,21 +18,26 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class ReviveModule implements Module {
     private Game game;
     private BiMap<Entity, Player> armorStandMap;
+    
+    private BukkitTask endCheckTask;
+    
+    private Set<Projectile> thrownPotions;
     
     public ReviveModule(Game game) {
         this.game = game;
@@ -42,16 +48,19 @@ public class ReviveModule implements Module {
         ItemManager itemManager = ArcadeCorePlugin.getManagerHandler().getManager(ItemManager.class);
         itemManager.registerTag("revive_bomb", this::throwRevive);
         armorStandMap = HashBiMap.create();
+        thrownPotions = new HashSet<>();
     }
     
     @Override
     public void disable() {
+        cancelEndCheck();
         ItemManager itemManager = ArcadeCorePlugin.getManagerHandler().getManager(ItemManager.class);
         itemManager.unregister("revive_bomb");
         for (Entity entity : new ArrayList<>(armorStandMap.keySet())) {
             entity.remove();
         }
         armorStandMap = null;
+        thrownPotions = null;
     }
     
     @EventHandler
@@ -103,6 +112,12 @@ public class ReviveModule implements Module {
         ThrownPotion potion = player.launchProjectile(ThrownPotion.class);
         PotionProjectile projectile = new PotionProjectile(potion);
         projectile.addPotionSplashListener(this::handleSplash);
+        thrownPotions.add(potion);
+        Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> {
+            if (thrownPotions != null) {
+                thrownPotions.remove(potion);
+            }
+        }, 5 * 20);
         
         game.getProjectileManager().registerProjectile(projectile);
         
@@ -111,11 +126,28 @@ public class ReviveModule implements Module {
         player.updateInventory();
     }
     
+    @EventHandler
+    public void onPlayerThrowPotion(ProjectileLaunchEvent e) {
+        if (!(e.getEntity() instanceof ThrownPotion)) return;
+        if (!(e.getEntity().getShooter() instanceof Player)) return;
+        Player player = (Player)e.getEntity().getShooter();
+        if (!game.getSpectateManager().isSpectator(player)) return;
+        
+        e.getEntity().remove();
+        int slot = player.getInventory().getHeldItemSlot();
+        int numPotions = getNumPotions(player, slot);
+        Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> setNumPotions(player, slot, numPotions));
+    }
+    
     private void handleSplash(PotionProjectile potion, PotionSplashEvent potionSplashEvent) {
         if (!(potion.getProjectile().getShooter() instanceof Player)) return;
         Player player = (Player)potion.getProjectile().getShooter();
     
         potionSplashEvent.setCancelled(true);
+        
+        thrownPotions.remove(potion.getProjectile());
+        cancelEndCheck();
+        
         Collection<LivingEntity> entities = potionSplashEvent.getAffectedEntities();
         for (LivingEntity entity : entities) {
             Player target;
@@ -134,6 +166,40 @@ public class ReviveModule implements Module {
                     target.teleport(entity);
                     armorStandMap.remove(entity);
                     Bukkit.getPluginManager().callEvent(new GameReviveEvent(target));
+                }
+            }
+        }
+    
+        game.getEndHandler().checkShouldEnd(game);
+    }
+    
+    private void scheduleEndCheck() {
+        cancelEndCheck();
+        endCheckTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> {
+            game.getEndHandler().checkShouldEnd(game);
+            cancelEndCheck();
+        }, 5 * 20);
+    }
+    
+    private void cancelEndCheck() {
+        if (endCheckTask != null) {
+            endCheckTask.cancel();
+            endCheckTask = null;
+        }
+    }
+    
+    @EventHandler
+    public void onGameEndCheck(GameEndCheckEvent e) {
+        if (e.getCheckReason() == GameEndCheckEvent.CheckReason.TOO_FEW_ALIVE) {
+            
+            for (Projectile proj : new ArrayList<>(thrownPotions)) {
+                if (!(proj.getShooter() instanceof Player)) continue;
+                Player thrower = (Player) proj.getShooter();
+                GameTeam team = game.getTeamManager().getTeam(thrower);
+                
+                if (team.getLivingPlayers().size() == 0) {
+                    e.setCancelled(true);
+                    scheduleEndCheck();
                 }
             }
         }

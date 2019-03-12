@@ -24,6 +24,8 @@ public class BasicKit extends Kit {
     
     @Override
     public void giveItems(Player player) {
+        player.getInventory().setContents(new ItemStack[36]);
+        player.getInventory().setArmorContents(new ItemStack[4]);
         player.getInventory().addItem(itemsFunction.apply(player).toArray(new ItemStack[0]));
         
         if (armorGenerator != null) {

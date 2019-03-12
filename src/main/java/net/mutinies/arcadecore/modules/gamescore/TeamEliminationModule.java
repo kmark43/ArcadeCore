@@ -1,11 +1,13 @@
 package net.mutinies.arcadecore.modules.gamescore;
 
 import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameEndCheckEvent;
 import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -42,28 +44,33 @@ public class TeamEliminationModule extends TeamWinHandler implements Module {
     @EventHandler
     public void onGameStart(GameStateSetEvent e) {
         if (e.getNewState() == GameStateManager.GameState.RUNNING) {
-            checkWon();
+            checkShouldEnd(game);
         }
     }
     
-    private void checkWon() {
+    @Override
+    public void checkShouldEnd(Game game) {
         int numWithPlayers = game.getTeamManager().getLivingTeams().size();
 
         if (numWithPlayers <= 1) {
-            game.getGameStateManager().stop();
+            GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.TOO_FEW_ALIVE);
+            Bukkit.getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                game.getGameStateManager().stop();
+            }
         }
     }
     
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        checkWon();
+        checkShouldEnd(game);
     }
 
     @EventHandler
     public void onPlayerDeath(GameDeathEvent e) {
         GameTeam team = game.getTeamManager().getTeam(e.getKilled());
         if (team.getLivingPlayers().size() == 0) {
-            checkWon();
+            checkShouldEnd(game);
         }
     }
 

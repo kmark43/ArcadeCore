@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public interface EndHandler extends Module {
+    void checkShouldEnd(Game game);
     void onWin(Game game);
     List<Player> getWinningPlayers(Game game);
 }

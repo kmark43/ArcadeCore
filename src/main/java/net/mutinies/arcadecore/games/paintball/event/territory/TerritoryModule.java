@@ -4,10 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
-import net.mutinies.arcadecore.event.GameDeathEvent;
-import net.mutinies.arcadecore.event.GameRespawnEvent;
-import net.mutinies.arcadecore.event.GameStateSetEvent;
-import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
+import net.mutinies.arcadecore.event.*;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
@@ -93,6 +90,43 @@ public class TerritoryModule extends TeamWinHandler {
         }
     }
     
+    @Override
+    public void checkShouldEnd(Game game) {
+        for (String teamName : scoreMap.keySet()) {
+            int value = scoreMap.get(teamName);
+            if (value >= ((Integer) game.getConfigManager().getProperty("target_score").getValue())) {
+                GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.SCORE);
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    winner = game.getTeamManager().getTeam(teamName);
+                    game.getGameStateManager().stop();
+                } else {
+                    return;
+                }
+            }
+        }
+        
+        List<GameTeam> teamsWithPlayers = game.getTeamManager().getTeamsWithPlayers();
+        List<GameTeam> teamsInGame = new ArrayList<>();
+        
+        for (GameTeam team : teamsWithPlayers) {
+            if (!team.getLivingPlayers().isEmpty() || !getClaimedTerritories(team).isEmpty()) {
+                teamsInGame.add(team);
+            }
+        }
+        
+        if (teamsInGame.size() <= 1) {
+            GameTeam lastTeam = teamsInGame.size() == 1 ? teamsInGame.get(0) : null;
+            
+            GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.TOO_FEW_ALIVE);
+            Bukkit.getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                winner = lastTeam;
+                game.getGameStateManager().stop();
+            }
+        }
+    }
+    
     private void setScoreboardLines() {
         game.getScoreboardManager().setTitle("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + game.getDisplayName());
         game.getScoreboardManager().setLineFunction((player -> {
@@ -129,22 +163,14 @@ public class TerritoryModule extends TeamWinHandler {
     public void onPlayerDeath(GameDeathEvent e) {
         Player player = e.getKilled();
         GameTeam team = game.getTeamManager().getTeam(player);
-        
-        if (team.getLivingPlayers().size() == 0 &&
-                getClaimedTerritories(team).size() == 0 &&
-                game.getTeamManager().getLivingTeams().size() <= 1) {
-            if (game.getTeamManager().getLivingTeams().size() == 1) {
-                winner = game.getTeamManager().getLivingTeams().get(0);
-            }
-            game.getGameStateManager().stop();
-        } else {
-            BukkitTask task = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> {
-                respawnTasks.remove(player.getUniqueId());
-                respawnPlayer(player);
-            }, (Integer) game.getConfigManager().getProperty("respawn_time").getValue());
     
-            respawnTasks.put(player.getUniqueId(), task);
-        }
+        BukkitTask task = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> {
+            respawnTasks.remove(player.getUniqueId());
+            respawnPlayer(player);
+        }, (Integer) game.getConfigManager().getProperty("respawn_time").getValue());
+    
+        respawnTasks.put(player.getUniqueId(), task);
+        checkShouldEnd(game);
     }
     
     @EventHandler
@@ -158,6 +184,7 @@ public class TerritoryModule extends TeamWinHandler {
                 respawnPlayer(player);
             }
         }
+        checkShouldEnd(game);
     }
     
     private void respawnPlayer(Player player) {
@@ -166,12 +193,10 @@ public class TerritoryModule extends TeamWinHandler {
         if (!claimedTerritories.isEmpty()) {
             Territory territory = claimedTerritories.get((int) (Math.random() * claimedTerritories.size()));
             game.getDamageManager().respawn(player);
+            game.getKitManager().getKit(player).giveItems(player);
             player.teleport(territory.getCenterLocation().clone().add(0, 1, 0));
-        } else if (team.getLivingPlayers().size() == 0 && game.getTeamManager().getLivingTeams().size() <= 1) {
-            if (game.getTeamManager().getLivingTeams().size() == 1) {
-                winner = game.getTeamManager().getLivingTeams().get(0);
-            }
-            game.getGameStateManager().stop();
+        } else {
+            checkShouldEnd(game);
         }
     }
     
@@ -182,25 +207,7 @@ public class TerritoryModule extends TeamWinHandler {
     }
     
     private void checkEliminationWin() {
-        if (game.getTeamManager().getLivingTeams().size() <= 1) {
-            GameTeam winningTeam = game.getTeamManager().getLivingTeams().get(0);
-        
-            boolean shouldStop = true;
-            for (UUID uuid : respawnTasks.keySet()) {
-                Player player = Bukkit.getPlayer(uuid);
-                GameTeam team = game.getTeamManager().getTeam(player);
-                assert !game.getDamageManager().isAlive(player);
-            
-                if (winningTeam != null && !team.equals(winningTeam) && !getClaimedTerritories(team).isEmpty()) {
-                    shouldStop = false;
-                    break;
-                }
-            }
-            if (shouldStop) {
-                winner = winningTeam;
-                game.getGameStateManager().stop();
-            }
-        }
+        checkShouldEnd(game);
     }
     
     @EventHandler
@@ -289,8 +296,7 @@ public class TerritoryModule extends TeamWinHandler {
             scoreMap.put(team.getName(), score);
             
             if (score >= (int) game.getConfigManager().getProperty("target_score").getValue()) {
-                winner = team;
-                game.getGameStateManager().stop();
+                checkShouldEnd(game);
             }
         }
     }
