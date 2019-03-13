@@ -48,6 +48,7 @@ public class TerritoryModule extends TeamWinHandler {
         this.reviveModule = reviveModule;
         game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.INT, "target_score", targetScore));
         game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.INT, "respawn_time", respawnTime));
+        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.BOOLEAN, "neutralize_territories_first", true));
         setScoreboardLines();
     }
     
@@ -258,7 +259,11 @@ public class TerritoryModule extends TeamWinHandler {
             case STAINED_GLASS:
             case STAINED_GLASS_PANE:
             case CARPET:
-                block.setData(dyeColor.getData());
+                if (block.getData() == DyeColor.WHITE.getData() && (boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
+                    block.setData(dyeColor.getData());
+                } else {
+                    block.setData(DyeColor.WHITE.getData());
+                }
                 break;
         }
         
