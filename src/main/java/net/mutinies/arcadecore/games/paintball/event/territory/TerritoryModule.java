@@ -205,7 +205,7 @@ public class TerritoryModule extends TeamWinHandler {
         List<Territory> territories = getClaimedTerritories(e.getTeam());
         if (territories.isEmpty()) {
             TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
-                    "is in the " + ChatColor.DARK_RED + "danger zone");
+                    "is in the " + ChatColor.DARK_RED + "Danger Zone");
         }
     }
     
