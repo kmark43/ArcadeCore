@@ -14,6 +14,7 @@ import net.mutinies.arcadecore.games.paintball.PaintBlocksEvent;
 import net.mutinies.arcadecore.games.paintball.ReviveModule;
 import net.mutinies.arcadecore.modules.gamescore.TeamWinHandler;
 import net.mutinies.arcadecore.util.JsonUtil;
+import net.mutinies.arcadecore.util.TitleUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -41,6 +42,9 @@ public class TerritoryModule extends TeamWinHandler {
     
     private Map<UUID, BukkitTask> respawnTasks;
     
+    private boolean hundredShown;
+    private boolean tenShown;
+    
     private GameTeam winner;
     
     public TerritoryModule(Game game, ReviveModule reviveModule, int targetScore, int respawnTime) {
@@ -57,6 +61,8 @@ public class TerritoryModule extends TeamWinHandler {
         scoreMap = new HashMap<>();
         territories = new ArrayList<>();
         respawnTasks = new HashMap<>();
+        hundredShown = false;
+        tenShown = false;
     
         parseTerritories();
     
@@ -68,6 +74,8 @@ public class TerritoryModule extends TeamWinHandler {
     @Override
     public void disable() {
         respawnTasks.values().forEach(BukkitTask::cancel);
+        hundredShown = false;
+        tenShown = false;
         scoreMap = null;
         scoreTask = null;
         respawnTasks = null;
@@ -81,6 +89,7 @@ public class TerritoryModule extends TeamWinHandler {
             scoreTask = Bukkit.getScheduler().runTaskTimer(ArcadeCorePlugin.getInstance(),
                     this::incrementScores,
                     20, 20);
+            Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> checkShouldEnd(game));
         }
     }
     
@@ -189,6 +198,17 @@ public class TerritoryModule extends TeamWinHandler {
         checkShouldEnd(game);
     }
     
+    @EventHandler
+    public void onTerritoryUnclaim(TerritoryUnclaimEvent e) {
+        if (game.getGameStateManager().getState() != GameStateManager.GameState.RUNNING) return;
+        GameTeam team = e.getTeam();
+        List<Territory> territories = getClaimedTerritories(e.getTeam());
+        if (territories.isEmpty()) {
+            TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
+                    "is in the " + ChatColor.DARK_RED + "danger zone");
+        }
+    }
+    
     private void respawnPlayer(Player player) {
         GameTeam team = game.getTeamManager().getTeam(player);
         List<Territory> claimedTerritories = getClaimedTerritories(team);
@@ -259,7 +279,8 @@ public class TerritoryModule extends TeamWinHandler {
             case STAINED_GLASS:
             case STAINED_GLASS_PANE:
             case CARPET:
-                if (block.getData() == DyeColor.WHITE.getData() && (boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
+                if (block.getData() == DyeColor.WHITE.getData() || block.getData() == team.getColor().getDyeColor().getData() &&
+                        (boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
                     block.setData(dyeColor.getData());
                 } else {
                     block.setData(DyeColor.WHITE.getData());
@@ -301,8 +322,19 @@ public class TerritoryModule extends TeamWinHandler {
             int score = scoreMap.getOrDefault(team.getName(), 0);
             score++;
             scoreMap.put(team.getName(), score);
+            int targetScore = (int) game.getConfigManager().getProperty("target_score").getValue();
             
-            if (score >= (int) game.getConfigManager().getProperty("target_score").getValue()) {
+            if (score >= targetScore - 100 && !hundredShown && targetScore >= 200) {
+                hundredShown = true;
+                TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
+                        "100 points to win");
+            } else if (score >= targetScore - 10 && !tenShown && targetScore >= 20) {
+                tenShown = true;
+                TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
+                        "10 points to win");
+            }
+    
+            if (score >= targetScore) {
                 checkShouldEnd(game);
             }
         }
