@@ -5,6 +5,7 @@ import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.kit.BasicKit;
 import net.mutinies.arcadecore.game.kit.armor.TeamArmorGenerator;
 import net.mutinies.arcadecore.games.oitq.GiveArrowOnKillModule;
+import net.mutinies.arcadecore.games.oitq.GiveKitOnRespawnModule;
 import net.mutinies.arcadecore.games.oitq.ProjectileLaunchTagger;
 import net.mutinies.arcadecore.games.oitq.event.ArrowBounceHandler;
 import net.mutinies.arcadecore.games.oitq.event.InstantKillHandler;
@@ -123,7 +124,13 @@ public class GameMaker {
         launchTagger.registerLaunchHandler(((player, projectile) -> projectile.addDamageHandler(new InstantKillHandler())));
     
         oitq.getModuleManager().addModules(ModuleUtil.getPvpList());
-        oitq.getModuleManager().addModules(comboModule, launchTagger, new GiveArrowOnKillModule(), new DelayedRespawnModule(5), new TeleportToRandomSpawnpointOnReviveModule());
+        
+        oitq.getModuleManager().addModules(comboModule,
+                launchTagger,
+                new GiveArrowOnKillModule(),
+                new GiveKitOnRespawnModule(),
+                new DelayedRespawnModule(5),
+                new TeleportToRandomSpawnpointOnReviveModule());
     
         BasicKit jumperKit = new BasicKit("jumper", "Jumper", new ItemStack(Material.IRON_AXE),
                 player -> Arrays.asList(ItemBuilder.of(Material.IRON_AXE).unbreakable().build(),
