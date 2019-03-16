@@ -265,7 +265,7 @@ public class TerritoryModule extends TeamWinHandler {
         Territory territory = getTerritory(e.getHitBlock());
         if (territory == null) return;
         
-        String owningTeamName = territory.getOwningTeamName();
+        GameTeam owningTeam = territory.getOwningTeam();
         
         Block block = e.getHitBlock();
         BlockState state = block.getState();
@@ -279,16 +279,19 @@ public class TerritoryModule extends TeamWinHandler {
             case STAINED_GLASS:
             case STAINED_GLASS_PANE:
             case CARPET:
-                if (block.getData() == DyeColor.WHITE.getData() || block.getData() == team.getColor().getDyeColor().getData() &&
-                        (boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
-                    block.setData(dyeColor.getData());
+                if ((boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
+                    if (block.getData() == DyeColor.WHITE.getData() || block.getData() == team.getColor().getDyeColor().getData()) {
+                        block.setData(dyeColor.getData());
+                    } else {
+                        block.setData(DyeColor.WHITE.getData());
+                    }
                 } else {
-                    block.setData(DyeColor.WHITE.getData());
+                    block.setData(dyeColor.getData());
                 }
                 break;
         }
         
-        if (owningTeamName == null) {
+        if (owningTeam == null) {
             BlockFace[] relatives = {BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};
             Block center = territory.getCenterLocation().getBlock();
             
@@ -306,19 +309,39 @@ public class TerritoryModule extends TeamWinHandler {
                 territory.claim(team);
                 Bukkit.getPluginManager().callEvent(new TerritoryClaimEvent(territory, team));
             }
-        } else if (!owningTeamName.equals(team.getName())) {
-            territory.unclaim();
-            GameTeam t = game.getTeamManager().getTeam(owningTeamName);
-            checkEliminationWin();
-            Bukkit.getPluginManager().callEvent(new TerritoryUnclaimEvent(territory, t));
+        } else if (!owningTeam.equals(team)) {
+            if ((boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
+                BlockFace[] relatives = {BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};
+                Block center = territory.getCenterLocation().getBlock();
+    
+                boolean noneMatch = true;
+                for (BlockFace relative : relatives) {
+                    Block b = center.getRelative(relative);
+                    DyeColor bColor = DyeColor.getByData(b.getData());
+                    if (bColor.equals(owningTeam.getColor().getDyeColor())) {
+                        noneMatch = false;
+                        break;
+                    }
+                }
+    
+                if (noneMatch) {
+                    territory.unclaim();
+                    checkEliminationWin();
+                    Bukkit.getPluginManager().callEvent(new TerritoryUnclaimEvent(territory, owningTeam));
+                }
+            } else {
+                territory.unclaim();
+                checkEliminationWin();
+                Bukkit.getPluginManager().callEvent(new TerritoryUnclaimEvent(territory, owningTeam));
+            }
         }
     }
     
     private void incrementScores() {
         for (Territory territory : territories) {
-            String teamName = territory.getOwningTeamName();
-            if (teamName == null) continue;
-            GameTeam team = game.getTeamManager().getTeam(teamName);
+            GameTeam team = territory.getOwningTeam();
+            if (team == null) return;
+            
             int score = scoreMap.getOrDefault(team.getName(), 0);
             score++;
             scoreMap.put(team.getName(), score);
@@ -369,8 +392,8 @@ public class TerritoryModule extends TeamWinHandler {
     }
     
     private List<Territory> getClaimedTerritories(GameTeam team) {
-        return territories.stream().filter(territory -> territory.getOwningTeamName() != null &&
-                territory.getOwningTeamName().equals(team.getName()))
+        return territories.stream().filter(territory -> territory.getOwningTeam() != null &&
+                territory.getOwningTeam().equals(team.getName()))
                 .collect(Collectors.toList());
     }
 }

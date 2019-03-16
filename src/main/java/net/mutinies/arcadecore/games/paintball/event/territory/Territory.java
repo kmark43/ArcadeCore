@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 public class Territory {
-    private String owningTeamName;
+    private GameTeam owningTeam;
     private Location centerLocation;
     
     public Territory(Location centerLocation) {
@@ -14,17 +14,17 @@ public class Territory {
     }
     
     public void claim(GameTeam team) {
-        this.owningTeamName = team.getName();
+        this.owningTeam = team;
         colorCenter(team.getColor().getDyeColor());
     }
     
     public void unclaim() {
-        this.owningTeamName = null;
+        this.owningTeam = null;
         colorCenter(DyeColor.WHITE);
     }
     
-    public String getOwningTeamName() {
-        return owningTeamName;
+    public GameTeam getOwningTeam() {
+        return owningTeam;
     }
     
     public Location getCenterLocation() {
