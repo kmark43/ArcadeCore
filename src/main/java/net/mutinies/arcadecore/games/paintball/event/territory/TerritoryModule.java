@@ -393,7 +393,7 @@ public class TerritoryModule extends TeamWinHandler {
     
     private List<Territory> getClaimedTerritories(GameTeam team) {
         return territories.stream().filter(territory -> territory.getOwningTeam() != null &&
-                territory.getOwningTeam().equals(team.getName()))
+                territory.getOwningTeam().equals(team))
                 .collect(Collectors.toList());
     }
 }
