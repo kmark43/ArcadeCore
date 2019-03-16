@@ -340,7 +340,7 @@ public class TerritoryModule extends TeamWinHandler {
     private void incrementScores() {
         for (Territory territory : territories) {
             GameTeam team = territory.getOwningTeam();
-            if (team == null) return;
+            if (team == null) continue;
             
             int score = scoreMap.getOrDefault(team.getName(), 0);
             score++;
