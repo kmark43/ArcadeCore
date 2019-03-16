@@ -29,7 +29,7 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
             game.getScoreboardManager().setLineFunction(player -> {
                 List<String> lines = new ArrayList<>();
                 
-                List<Player> sorted = getRankedPlayers();
+                List<Player> sorted = getSortedPlayers();
             
                 for (int i = 0; i < Math.min(sorted.size(), 15); i++) {
                     Player p = sorted.get(i);
@@ -111,13 +111,21 @@ public class PlayerKillTargetModule extends SoloWinHandler implements Module {
             checkEnoughPlayers();
         }
     }
-
-    @Override
-    public List<Player> getRankedPlayers() {
+    
+    private List<Player> getSortedPlayers() {
         return scoreMap.keySet().stream()
                 .filter(uuid -> Bukkit.getPlayer(uuid) != null)
                 .sorted(Comparator.comparingInt(scoreMap::get).reversed())
                 .map(Bukkit::getPlayer)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Player> getRankedPlayers() {
+        List<Player> ranked = getSortedPlayers();
+        if (!ranked.isEmpty() && scoreMap.get(ranked.get(0).getUniqueId()) < target) {
+            return null;
+        }
+        return ranked;
     }
 }
