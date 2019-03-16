@@ -1,4 +1,4 @@
-package net.mutinies.arcadecore.games.paintball.event.territory;
+package net.mutinies.arcadecore.modules.territory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,7 +13,6 @@ import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
-import net.mutinies.arcadecore.games.paintball.PaintBlocksEvent;
 import net.mutinies.arcadecore.modules.gamescore.TeamWinHandler;
 import net.mutinies.arcadecore.util.JsonUtil;
 import net.mutinies.arcadecore.util.TitleUtil;
@@ -220,16 +219,6 @@ public class TerritoryModule extends TeamWinHandler {
         BukkitTask task = respawnTasks.remove(player.getUniqueId());
         if (task != null) {
             task.cancel();
-        }
-    }
-    
-    @EventHandler
-    public void onBlocksPainted(PaintBlocksEvent e) {
-        for (Block block : new ArrayList<>(e.getBlocks())) {
-            Territory territory = getTerritory(block);
-            if (territory != null) {
-                e.getBlocks().remove(block);
-            }
         }
     }
     

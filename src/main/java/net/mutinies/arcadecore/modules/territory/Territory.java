@@ -1,4 +1,4 @@
-package net.mutinies.arcadecore.games.paintball.event.territory;
+package net.mutinies.arcadecore.modules.territory;
 
 import net.mutinies.arcadecore.game.team.GameTeam;
 import org.bukkit.Bukkit;

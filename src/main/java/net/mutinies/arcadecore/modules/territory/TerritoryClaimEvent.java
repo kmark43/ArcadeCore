@@ -1,16 +1,16 @@
-package net.mutinies.arcadecore.games.paintball.event.territory;
+package net.mutinies.arcadecore.modules.territory;
 
 import net.mutinies.arcadecore.game.team.GameTeam;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class TerritoryUnclaimEvent extends Event {
+public class TerritoryClaimEvent extends Event {
     private static HandlerList handlerList = new HandlerList();
     
     private Territory territory;
     private GameTeam team;
     
-    public TerritoryUnclaimEvent(Territory territory, GameTeam team) {
+    public TerritoryClaimEvent(Territory territory, GameTeam team) {
         this.territory = territory;
         this.team = team;
     }
