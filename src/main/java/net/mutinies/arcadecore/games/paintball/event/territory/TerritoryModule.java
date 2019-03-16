@@ -4,29 +4,26 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
-import net.mutinies.arcadecore.event.*;
+import net.mutinies.arcadecore.event.GameDeathEvent;
+import net.mutinies.arcadecore.event.GameEndCheckEvent;
+import net.mutinies.arcadecore.event.GameRespawnEvent;
+import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.games.paintball.PaintBlocksEvent;
-import net.mutinies.arcadecore.games.paintball.ReviveModule;
 import net.mutinies.arcadecore.modules.gamescore.TeamWinHandler;
 import net.mutinies.arcadecore.util.JsonUtil;
 import net.mutinies.arcadecore.util.TitleUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -34,7 +31,6 @@ import java.util.stream.Collectors;
 
 public class TerritoryModule extends TeamWinHandler {
     private Game game;
-    private ReviveModule reviveModule;
     
     private Map<String, Integer> scoreMap;
     private List<Territory> territories;
@@ -47,12 +43,10 @@ public class TerritoryModule extends TeamWinHandler {
     
     private GameTeam winner;
     
-    public TerritoryModule(Game game, ReviveModule reviveModule, int targetScore, int respawnTime) {
+    public TerritoryModule(Game game, int targetScore, int respawnTime) {
         this.game = game;
-        this.reviveModule = reviveModule;
         game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.INT, "target_score", targetScore));
         game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.INT, "respawn_time", respawnTime));
-        game.getConfigManager().registerProperty(new ConfigProperty(ConfigType.BOOLEAN, "neutralize_territories_first", true));
         setScoreboardLines();
     }
     
@@ -159,18 +153,6 @@ public class TerritoryModule extends TeamWinHandler {
     }
     
     @EventHandler
-    public void givePotion(GameDeathEvent e) {
-        if (e.getKiller() instanceof Player) {
-            Player player = (Player)e.getKiller();
-            int numPotions = reviveModule.getNumPotions(player, 1);
-            if (numPotions < 3) {
-//                player.getInventory().addItem(reviveModule.getReviveStack(player, 1));
-                reviveModule.setNumPotions(player, 1, numPotions + 1);
-            }
-        }
-    }
-    
-    @EventHandler
     public void onPlayerDeath(GameDeathEvent e) {
         Player player = e.getKilled();
         GameTeam team = game.getTeamManager().getTeam(player);
@@ -207,6 +189,7 @@ public class TerritoryModule extends TeamWinHandler {
             TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
                     "is in the " + ChatColor.DARK_RED + "Danger Zone");
         }
+        checkShouldEnd(game);
     }
     
     private void respawnPlayer(Player player) {
@@ -225,10 +208,6 @@ public class TerritoryModule extends TeamWinHandler {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         cancelRespawn(e.getPlayer());
-        checkEliminationWin();
-    }
-    
-    private void checkEliminationWin() {
         checkShouldEnd(game);
     }
     
@@ -250,89 +229,6 @@ public class TerritoryModule extends TeamWinHandler {
             Territory territory = getTerritory(block);
             if (territory != null) {
                 e.getBlocks().remove(block);
-            }
-        }
-    }
-    
-    @EventHandler
-    public void onProjectileHitBlock(ProjectileHitBlockEvent e) {
-        if (e.getProjectile() instanceof ThrownPotion) return;
-        if (!(e.getProjectile().getShooter() instanceof Player)) return;
-        Player shooter = (Player)e.getProjectile().getShooter();
-        GameTeam team = game.getTeamManager().getTeam(shooter);
-        DyeColor dyeColor = team.getColor().getDyeColor();
-    
-        Territory territory = getTerritory(e.getHitBlock());
-        if (territory == null) return;
-        
-        GameTeam owningTeam = territory.getOwningTeam();
-        
-        Block block = e.getHitBlock();
-        BlockState state = block.getState();
-        MaterialData data = state.getData();
-        
-        if (block.equals(territory.getCenterLocation().getBlock())) return;
-    
-        switch (data.getItemType()) {
-            case WOOL:
-            case STAINED_CLAY:
-            case STAINED_GLASS:
-            case STAINED_GLASS_PANE:
-            case CARPET:
-                if ((boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
-                    if (block.getData() == DyeColor.WHITE.getData() || block.getData() == team.getColor().getDyeColor().getData()) {
-                        block.setData(dyeColor.getData());
-                    } else {
-                        block.setData(DyeColor.WHITE.getData());
-                    }
-                } else {
-                    block.setData(dyeColor.getData());
-                }
-                break;
-        }
-        
-        if (owningTeam == null) {
-            BlockFace[] relatives = {BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};
-            Block center = territory.getCenterLocation().getBlock();
-            
-            boolean allMatch = true;
-            for (BlockFace relative : relatives) {
-                Block b = center.getRelative(relative);
-                DyeColor bColor = DyeColor.getByData(b.getData());
-                if (!bColor.equals(dyeColor)) {
-                    allMatch = false;
-                    break;
-                }
-            }
-            
-            if (allMatch) {
-                territory.claim(team);
-                Bukkit.getPluginManager().callEvent(new TerritoryClaimEvent(territory, team));
-            }
-        } else if (!owningTeam.equals(team)) {
-            if ((boolean) game.getConfigManager().getProperty("neutralize_territories_first").getValue()) {
-                BlockFace[] relatives = {BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};
-                Block center = territory.getCenterLocation().getBlock();
-    
-                boolean noneMatch = true;
-                for (BlockFace relative : relatives) {
-                    Block b = center.getRelative(relative);
-                    DyeColor bColor = DyeColor.getByData(b.getData());
-                    if (bColor.equals(owningTeam.getColor().getDyeColor())) {
-                        noneMatch = false;
-                        break;
-                    }
-                }
-    
-                if (noneMatch) {
-                    territory.unclaim();
-                    checkEliminationWin();
-                    Bukkit.getPluginManager().callEvent(new TerritoryUnclaimEvent(territory, owningTeam));
-                }
-            } else {
-                territory.unclaim();
-                checkEliminationWin();
-                Bukkit.getPluginManager().callEvent(new TerritoryUnclaimEvent(territory, owningTeam));
             }
         }
     }
@@ -377,7 +273,7 @@ public class TerritoryModule extends TeamWinHandler {
         }
     }
     
-    private Territory getTerritory(Block block) {
+    public Territory getTerritory(Block block) {
         Territory territory = null;
         for (Territory t : territories) {
             if (block.getY() == t.getCenterLocation().getBlockY() &&
@@ -391,7 +287,7 @@ public class TerritoryModule extends TeamWinHandler {
         return territory;
     }
     
-    private List<Territory> getClaimedTerritories(GameTeam team) {
+    public List<Territory> getClaimedTerritories(GameTeam team) {
         return territories.stream().filter(territory -> territory.getOwningTeam() != null &&
                 territory.getOwningTeam().equals(team))
                 .collect(Collectors.toList());

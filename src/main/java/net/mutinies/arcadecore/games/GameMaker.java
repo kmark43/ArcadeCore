@@ -10,6 +10,8 @@ import net.mutinies.arcadecore.games.oitq.event.ArrowBounceHandler;
 import net.mutinies.arcadecore.games.oitq.event.InstantKillHandler;
 import net.mutinies.arcadecore.games.paintball.PaintBlockModule;
 import net.mutinies.arcadecore.games.paintball.event.spleef.BreakBlockModule;
+import net.mutinies.arcadecore.games.paintball.event.territory.GivePotionOnKillModule;
+import net.mutinies.arcadecore.games.paintball.event.territory.PaintingTerritoryClaimModule;
 import net.mutinies.arcadecore.games.paintball.event.territory.TerritoryModule;
 import net.mutinies.arcadecore.modules.DelayedRespawnModule;
 import net.mutinies.arcadecore.modules.KillComboModule;
@@ -60,7 +62,10 @@ public class GameMaker {
         Game paintball = new Game("territory_paintball", "Territory Paintball", "TPB", 2, 40);
         
         PaintballMaker paintballMaker = new PaintballMaker(paintball);
-        paintball.setEndHandler(new TerritoryModule(paintball, paintballMaker.getReviveModule(), 500, 20 * 5));
+        TerritoryModule territoryModule = new TerritoryModule(paintball, 500, 20 * 5);
+        paintball.setEndHandler(territoryModule);
+        paintballMaker.addModule("territory_claim_module", new PaintingTerritoryClaimModule(paintball, territoryModule));
+        paintballMaker.addModule("give_potion_module", new GivePotionOnKillModule(paintballMaker.getReviveModule()));
         paintballMaker.applyKitsAndModules();
 
         ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
