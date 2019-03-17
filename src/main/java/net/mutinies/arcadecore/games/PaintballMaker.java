@@ -8,6 +8,7 @@ import net.mutinies.arcadecore.games.paintball.*;
 import net.mutinies.arcadecore.games.paintball.gun.GunModule;
 import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.module.Module;
+import net.mutinies.arcadecore.modules.KillComboModule;
 import net.mutinies.arcadecore.modules.gamescore.TeamEliminationModule;
 import net.mutinies.arcadecore.modules.prevent.NoFriendlyFireModule;
 import net.mutinies.arcadecore.modules.prevent.NoPearlTeleportModule;
@@ -48,6 +49,10 @@ public class PaintballMaker {
         gunModule = new GunModule(paintball);
         reviveModule = new ReviveModule(paintball);
         armorPaintingModule = new ArmorPaintingModule(paintball);
+    
+        KillComboModule comboModule = new KillComboModule(4 * 20);
+        comboModule.addComboType("TRIPLE KILL", 3);
+        comboModule.addComboType("PENTA KILL", 5);
         
         addModule("no_regen", new NoRegenModule());
         addModule("no_pearl_teleport", new NoPearlTeleportModule());
@@ -58,6 +63,7 @@ public class PaintballMaker {
         addModule("gun", gunModule);
         addModule("revive", reviveModule);
         addModule("armor_painting", armorPaintingModule);
+        addModule("combo", comboModule);
     
         // Rifle
         ItemStack rifleStack = ItemManager.tag(ItemBuilder.of(Material.IRON_BARDING).name("" + ChatColor.WHITE + "Rifle").build(), "gun_rifle");

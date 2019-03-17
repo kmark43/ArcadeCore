@@ -10,7 +10,6 @@ import net.mutinies.arcadecore.modules.territory.Territory;
 import net.mutinies.arcadecore.modules.territory.TerritoryClaimEvent;
 import net.mutinies.arcadecore.modules.territory.TerritoryModule;
 import net.mutinies.arcadecore.modules.territory.TerritoryUnclaimEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -101,11 +100,9 @@ public class PaintingTerritoryClaimModule implements Module {
                 
                 if (noneMatch) {
                     territory.unclaim();
-                    Bukkit.getPluginManager().callEvent(new TerritoryUnclaimEvent(territory, owningTeam));
                 }
             } else {
                 territory.unclaim();
-                Bukkit.getPluginManager().callEvent(new TerritoryUnclaimEvent(territory, owningTeam));
             }
         }
     }
@@ -116,7 +113,7 @@ public class PaintingTerritoryClaimModule implements Module {
     }
     
     @EventHandler
-    public void onTerritoryUnclaim(TerritoryClaimEvent e) {
+    public void onTerritoryUnclaim(TerritoryUnclaimEvent e) {
         colorCenter(e.getTerritory(), DyeColor.WHITE);
     }
     
