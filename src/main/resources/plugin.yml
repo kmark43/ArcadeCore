@@ -26,3 +26,13 @@ commands:
     description: Sets current game map
   config:
     description: Change the current game's configuration
+  pause:
+    description: Change the current game's configuration
+    permission: mutinies.arcadecore.pause
+
+permissions:
+  mutinies.arcadecore.*:
+    children:
+      mutinies.arcadecore.pause: true
+  mutinies.arcadecore.pause:
+    default: op

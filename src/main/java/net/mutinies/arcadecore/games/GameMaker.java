@@ -14,6 +14,7 @@ import net.mutinies.arcadecore.games.paintball.event.spleef.BreakBlockModule;
 import net.mutinies.arcadecore.games.paintball.event.territory.GivePotionOnKillModule;
 import net.mutinies.arcadecore.games.paintball.event.territory.PaintingTerritoryClaimModule;
 import net.mutinies.arcadecore.games.paintball.event.territory.PreventTerritoryPaintModule;
+import net.mutinies.arcadecore.modules.SpawnProtectionModule;
 import net.mutinies.arcadecore.modules.territory.TerritoryModule;
 import net.mutinies.arcadecore.modules.DelayedRespawnModule;
 import net.mutinies.arcadecore.modules.KillComboModule;
@@ -69,6 +70,7 @@ public class GameMaker {
         paintballMaker.addModule("territory_claim", new PaintingTerritoryClaimModule(paintball, territoryModule));
         paintballMaker.addModule("prevent_territory_paint", new PreventTerritoryPaintModule(territoryModule));
         paintballMaker.addModule("give_potion_module", new GivePotionOnKillModule(paintballMaker.getReviveModule()));
+        paintballMaker.addModule("spawn_protection", new SpawnProtectionModule(paintball, 10));
         paintballMaker.applyKitsAndModules();
 
         ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);

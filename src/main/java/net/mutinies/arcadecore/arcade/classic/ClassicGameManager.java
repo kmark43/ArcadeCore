@@ -45,6 +45,7 @@ public class ClassicGameManager implements GameManager {
     private int timeLeft;
     
     private boolean disabling = false;
+    private boolean paused = false;
     
     private List<Module> lobbyModules;
     
@@ -121,6 +122,9 @@ public class ClassicGameManager implements GameManager {
         
         ArcadeCorePlugin.getInstance().getCommand("config").setExecutor(new ConfigCommandExecutor());
         ArcadeCorePlugin.getInstance().getCommand("config").setTabCompleter(new ConfigCommandExecutor());
+    
+    
+        ArcadeCorePlugin.getInstance().getCommand("pause").setExecutor(new PauseExecutor(this));
         
         Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::startLobbyState);
     }
@@ -171,6 +175,24 @@ public class ClassicGameManager implements GameManager {
         }
     }
     
+    public void pause() {
+        if (!isGameRunning()) {
+            paused = true;
+            updateCountdownTask();
+        }
+    }
+    
+    public boolean isPaused() {
+        return paused;
+    }
+    
+    public void unpause() {
+        if (!isGameRunning()) {
+            paused = false;
+            updateCountdownTask();
+        }
+    }
+    
     @Override
     public void handleGameStop() {
         gameRunning = false;
@@ -190,7 +212,7 @@ public class ClassicGameManager implements GameManager {
         
         int numPlayers = ArcadeCorePlugin.getParticipants().size();
         
-        if (countdownTask != null && numPlayers <= 1) {
+        if (countdownTask != null && numPlayers <= 1 || paused) {
             stopCountdown();
             scoreboardManager.setTitle(ChatColor.BOLD + "Waiting for players");
         } else if (countdownTask == null && numPlayers >= 2) {
@@ -334,6 +356,8 @@ public class ClassicGameManager implements GameManager {
         }
         
         gameRunning = true;
+        paused = false;
+        
         endLobbyState();
         
         getGame().getGameStateManager().start();
