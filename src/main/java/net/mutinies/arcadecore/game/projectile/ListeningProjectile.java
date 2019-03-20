@@ -1,7 +1,10 @@
 package net.mutinies.arcadecore.game.projectile;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -13,10 +16,20 @@ public class ListeningProjectile {
     private List<ProjectileDamageHandler> damageHandlers;
     private List<ProjectileHitHandler> projectileHitHandlers;
     private List<ProjectileHitBlockHandler> projectileHitBlockHandlers;
+    private Entity shooter;
+    private ItemStack shootingItem;
     private Projectile projectile;
     private Location origin;
     private Vector initialVelocity;
     private long launchTime;
+    
+    public ListeningProjectile(Projectile projectile, Entity shooter) {
+        this(projectile);
+        this.shooter = shooter;
+        if (shooter instanceof Player) {
+            shootingItem = ((Player) shooter).getItemInHand();
+        }
+    }
     
     public ListeningProjectile(Projectile projectile) {
         this.projectile = Objects.requireNonNull(projectile);
@@ -44,6 +57,14 @@ public class ListeningProjectile {
     
     public long getLaunchTime() {
         return launchTime;
+    }
+    
+    public Entity getShooter() {
+        return shooter;
+    }
+    
+    public ItemStack getShootingItem() {
+        return shootingItem;
     }
     
     public List<FlightTickHandler> getFlightHandlers() {

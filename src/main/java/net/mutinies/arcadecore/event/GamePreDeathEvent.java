@@ -13,16 +13,14 @@ public class GamePreDeathEvent extends Event {
     private static HandlerList handlerList = new HandlerList();
 
     private Player killed;
-    private Entity lastDamager;
-    private Entity lastPlayerDamager;
+    private Entity lastDamagerOrPlayer;
     private String deathMessage;
     private EntityDamageEvent.DamageCause cause;
     private LinkedList<DamageInstance> causes;
 
-    public GamePreDeathEvent(Player killed, Entity lastDamager, Player lastPlayerDamager, String deathMessage, EntityDamageEvent.DamageCause cause, LinkedList<DamageInstance> causes) {
+    public GamePreDeathEvent(Player killed, Entity lastDamagerOrPlayer, String deathMessage, EntityDamageEvent.DamageCause cause, LinkedList<DamageInstance> causes) {
         this.killed = killed;
-        this.lastDamager = lastDamager;
-        this.lastPlayerDamager = lastPlayerDamager;
+        this.lastDamagerOrPlayer = lastDamagerOrPlayer;
         this.deathMessage = deathMessage;
         this.cause = cause;
         this.causes = causes;
@@ -32,12 +30,8 @@ public class GamePreDeathEvent extends Event {
         return killed;
     }
     
-    public Entity getLastDamager() {
-        return lastDamager;
-    }
-    
-    public Entity getLastPlayerDamager() {
-        return lastPlayerDamager;
+    public Entity getLastDamagerOrPlayer() {
+        return lastDamagerOrPlayer;
     }
     
     public void setDeathMessage(String deathMessage) {
@@ -50,6 +44,14 @@ public class GamePreDeathEvent extends Event {
     
     public EntityDamageEvent.DamageCause getCause() {
         return cause;
+    }
+    
+    public Entity getDirectDamager() {
+        return getLastDamageInstance().getCauser();
+    }
+    
+    public DamageInstance getLastDamageInstance() {
+        return causes.getFirst();
     }
     
     public LinkedList<DamageInstance> getCauses() {

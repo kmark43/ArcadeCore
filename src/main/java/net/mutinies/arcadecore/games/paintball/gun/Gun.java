@@ -157,7 +157,7 @@ public class Gun {
             
             projectile.setVelocity(initialVelocityDeterminer.getInitialVelocity(player, projectile));
             
-            ListeningProjectile listeners = new ListeningProjectile(projectile);
+            ListeningProjectile listeners = new ListeningProjectile(projectile, player);
             
             game.getProjectileManager().registerProjectile(listeners);
     

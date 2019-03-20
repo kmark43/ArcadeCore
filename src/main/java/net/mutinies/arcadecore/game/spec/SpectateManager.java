@@ -7,6 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
@@ -52,6 +53,16 @@ public class SpectateManager implements Module {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         spectators.remove(e.getPlayer().getUniqueId());
+    }
+    
+    @EventHandler
+    public void onSpectatorDamage(EntityDamageEvent e) {
+        if (spectators.contains(e.getEntity().getUniqueId())) {
+            if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                e.getEntity().teleport(game.getMapManager().getCurrentMap().getMainSpawn().getLocation());
+            }
+            e.setCancelled(true);
+        }
     }
     
     public List<Player> getNonspectators() {

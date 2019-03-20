@@ -43,6 +43,14 @@ public class ProjectileManager implements Module {
         return projectile == null || projectileMap.containsKey(projectile.getUniqueId());
     }
     
+    public ListeningProjectile getListeningProjectile(Projectile projectile) {
+        if (projectile != null) {
+            return projectileMap.get(projectile.getUniqueId());
+        } else {
+            return null;
+        }
+    }
+    
     public void registerProjectile(ListeningProjectile projectile) {
         UUID uuid = projectile.getProjectile().getUniqueId();
         projectileMap.put(uuid, projectile);

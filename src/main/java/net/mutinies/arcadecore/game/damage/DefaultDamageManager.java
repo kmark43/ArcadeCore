@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import static net.mutinies.arcadecore.util.MessageUtil.getColoredName;
 
 public class DefaultDamageManager implements DamageManager {
+    private static final int LAST_DAMAGE_TAG_COOLDOWN = 10000;
     private Game game;
     
     private Map<UUID, LinkedList<DamageInstance>> damageTracking;
@@ -116,7 +117,7 @@ public class DefaultDamageManager implements DamageManager {
                 pDamager.setLevel(pDamager.getLevel() + (int)effectiveDamage);
             }
             
-            damageTracking.get(damagee.getUniqueId()).addFirst(new DamageInstance(e.getCause(), damager));
+            damageTracking.get(damagee.getUniqueId()).addFirst(new DamageInstance(e.getCause(), directDamager));
     
             Vector trajectory = directDamager.getVelocity().setY(0).normalize();
             playDamageEffect(damagee, trajectory, 2);
@@ -138,7 +139,7 @@ public class DefaultDamageManager implements DamageManager {
             pDamager.setLevel((int) effectiveDamage);
         }
     
-        damageTracking.get(e.getEntity().getUniqueId()).addFirst(new DamageInstance(e.getCause(), damager));
+        damageTracking.get(e.getEntity().getUniqueId()).addFirst(new DamageInstance(e.getCause(), directDamager));
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -228,7 +229,6 @@ public class DefaultDamageManager implements DamageManager {
         
         GamePreDeathEvent preDeathEvent = new GamePreDeathEvent(player,
                 getLastDamager(player),
-                getLastDamagingPlayer(player),
                 getDeathMessage(player),
                 lastDamage == null ? null : lastDamage.getCause(),
                 damageTracking.get(player.getUniqueId()));
@@ -237,36 +237,41 @@ public class DefaultDamageManager implements DamageManager {
         if (preDeathEvent.getDeathMessage() != null) {
             Bukkit.broadcastMessage(MessageUtil.formatMessage("Death", preDeathEvent.getDeathMessage()));
         }
+        
+        if (lastDamage != null && lastDamage.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            player.teleport(game.getMapManager().getCurrentMap().getMainSpawn().getLocation());
+        }
     
-        GameDeathEvent deathEvent = new GameDeathEvent(player, getLastDamager(player), getDeathMessage(player), deathLocation, damageTracking.get(player.getUniqueId()));
+        GameDeathEvent deathEvent = new GameDeathEvent(player,
+                getLastDamager(player),
+                getDeathMessage(player),
+                deathLocation,
+                lastDamage == null ? null : lastDamage.getCause(),
+                damageTracking.get(player.getUniqueId()));
+        
         Bukkit.getPluginManager().callEvent(deathEvent);
     }
     
     private Entity getLastDamager(Player player) {
         LinkedList<DamageInstance> damageInstances = damageTracking.get(player.getUniqueId());
         Entity damager = null;
+        long time = System.currentTimeMillis();
+        
         if (damageInstances != null) {
-            Iterator<DamageInstance> iterator = damageInstances.iterator();
-            while (iterator.hasNext()) {
-                DamageInstance next = iterator.next();
-                if (next.getCauser() != null) {
-                    damager = next.getCauser();
-                    break;
+            for (DamageInstance next : damageInstances) {
+                if (time - next.getTime() > LAST_DAMAGE_TAG_COOLDOWN) break;
+                
+                Entity causer = next.getCauser();
+                if (causer instanceof Projectile && ((Projectile) causer).getShooter() instanceof Player) {
+                    causer = (Player)((Projectile) causer).getShooter();
                 }
-            }
-        }
-        return damager;
-    }
-    
-    private Player getLastDamagingPlayer(Player player) {
-        LinkedList<DamageInstance> damageInstances = damageTracking.get(player.getUniqueId());
-        Player damager = null;
-        if (damageInstances != null) {
-            Iterator<DamageInstance> iterator = damageInstances.iterator();
-            while (iterator.hasNext()) {
-                DamageInstance next = iterator.next();
-                if (next.getCauser() instanceof Player) {
-                    damager = (Player) next.getCauser();
+                
+                if (causer != null && !(causer instanceof Player)) {
+                    if (damager == null) {
+                        damager = causer;
+                    }
+                } else if (causer != null) {
+                    damager = causer;
                     break;
                 }
             }
@@ -280,50 +285,124 @@ public class DefaultDamageManager implements DamageManager {
             return getColoredName(player) + MessageUtil.DEFAULT + " died";
         }
         DamageInstance lastDamage = damageInstances.getFirst();
-        // todo fix to work on if it wasn't the last damage - fall etc if last damager != null
+        Entity lastDamager = getLastDamager(player);
+    
         switch (lastDamage.getCause()) {
             case CONTACT:
                 return getColoredName(player) + MessageUtil.DEFAULT + " died";
             case ENTITY_ATTACK:
-                return getColoredName(player) + MessageUtil.DEFAULT + " was killed by " + getColoredName(lastDamage.getCauser());
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was killed by " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was killed.";
+                }
             case PROJECTILE:
-                return getColoredName(player) + MessageUtil.DEFAULT + " was shot by " + getColoredName(lastDamage.getCauser());
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was shot by " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was shot.";
+                }
             case SUFFOCATION:
-                return getColoredName(player) + MessageUtil.DEFAULT + " suffocated in a wall";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " suffocated in a wall while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " suffocated in a wall";
+                }
             case FALL:
-                return getColoredName(player) + MessageUtil.DEFAULT + " fell to their death";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " fell to their death while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " fell to their death";
+                }
             case FIRE:
-                return getColoredName(player) + MessageUtil.DEFAULT + " burned";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " burned while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " burned";
+                }
             case FIRE_TICK:
-                return getColoredName(player) + MessageUtil.DEFAULT + " burned";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " burned while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " burned";
+                }
             case MELTING:
-                return getColoredName(player) + MessageUtil.DEFAULT + " melted";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " melted while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " melted";
+                }
             case LAVA:
-                return getColoredName(player) + MessageUtil.DEFAULT + " burned in lava";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " burned in lava while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " burned in lava";
+                }
             case DROWNING:
-                return getColoredName(player) + MessageUtil.DEFAULT + " drowned";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " drowned while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " drowned";
+                }
             case BLOCK_EXPLOSION:
-                return getColoredName(player) + MessageUtil.DEFAULT + " was blown up";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was blown up while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was blown up.";
+                }
             case ENTITY_EXPLOSION:
-                return getColoredName(player) + MessageUtil.DEFAULT + " was blown up by " + getColoredName(lastDamage.getCauser());
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was blown up by " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was blown up.";
+                }
             case VOID:
-                return getColoredName(player) + MessageUtil.DEFAULT + " fell in the void";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was knocked in to the void by " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " fell in the void";
+                }
             case LIGHTNING:
+                if (lastDamager != null) {
+                
+                } else {
+                
+                }
                 return getColoredName(player) + MessageUtil.DEFAULT + " was struck by lightning";
             case SUICIDE:
                 return getColoredName(player) + MessageUtil.DEFAULT + " killed themselves";
             case STARVATION:
-                return getColoredName(player) + MessageUtil.DEFAULT + " starved";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " starved to death while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " starved to death";
+                }
             case POISON:
-                return getColoredName(player) + MessageUtil.DEFAULT + " got poisoned";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was poisoned to death while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was poisoned to death";
+                }
             case MAGIC:
                 return getColoredName(player) + MessageUtil.DEFAULT + " was killed by magic";
             case WITHER:
-                return getColoredName(player) + MessageUtil.DEFAULT + " withered away";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " withered away while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " withered away";
+                }
             case FALLING_BLOCK:
-                return getColoredName(player) + MessageUtil.DEFAULT + " was toppled";
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was toppled by a falling block while fighting " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was toppled by a falling block";
+                }
             case THORNS:
-                return getColoredName(player) + MessageUtil.DEFAULT + " was killed by " + getColoredName(lastDamage.getCauser());
+                if (lastDamager != null) {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was pricked to death by " + getColoredName(lastDamager);
+                } else {
+                    return getColoredName(player) + MessageUtil.DEFAULT + " was pricked to death.";
+                }
             case CUSTOM:
                 return getColoredName(player) + MessageUtil.DEFAULT + " was killed by custom";
             default:
