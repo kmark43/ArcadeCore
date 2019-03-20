@@ -14,6 +14,7 @@ public class MessageUtil {
     public static String ERROR = "" + ChatColor.DARK_BLUE;
     public static String CATEGORY = "" + ChatColor.WHITE;
     public static String VARIABLE = "" + ChatColor.LIGHT_PURPLE;
+    public static String SEPARATOR = "" + ChatColor.DARK_GRAY;
     public static String NUMBER = "" + ChatColor.DARK_GRAY;
     
     public static String getColoredName(Entity entity) {

@@ -13,12 +13,15 @@ import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
+import net.mutinies.arcadecore.games.paintball.event.territory.TerritoryRespawnEvent;
 import net.mutinies.arcadecore.modules.gamescore.TeamWinHandler;
 import net.mutinies.arcadecore.util.JsonUtil;
+import net.mutinies.arcadecore.util.MessageUtil;
 import net.mutinies.arcadecore.util.TitleUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -176,6 +179,13 @@ public class TerritoryModule extends TeamWinHandler {
                 respawnPlayer(player);
             }
         }
+        Bukkit.broadcastMessage(e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                "has " + MessageUtil.VARIABLE + "claimed" + MessageUtil.DEFAULT + " a territory");
+    
+        for (Player other : Bukkit.getOnlinePlayers()) {
+            other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, 1f);
+            Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, 1f), 5);
+        }
         checkShouldEnd(game);
     }
     
@@ -184,9 +194,25 @@ public class TerritoryModule extends TeamWinHandler {
         if (game.getGameStateManager().getState() != GameStateManager.GameState.RUNNING) return;
         GameTeam team = e.getTeam();
         List<Territory> territories = getClaimedTerritories(e.getTeam());
+    
+        Bukkit.broadcastMessage(e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                "has " + MessageUtil.VARIABLE + "lost" + " a territory");
+        
         if (territories.isEmpty()) {
+            for (Player other : Bukkit.getOnlinePlayers()) {
+                other.playSound(other.getLocation(), Sound.SILVERFISH_KILL, 1f, 1f);
+            }
+            
             TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
+                    "is in the " + ChatColor.DARK_RED + "Danger Zone", 2, 10, 2);
+            
+            Bukkit.broadcastMessage("" + team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
                     "is in the " + ChatColor.DARK_RED + "Danger Zone");
+        } else {
+            for (Player other : Bukkit.getOnlinePlayers()) {
+                other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, .3f);
+                Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, .3f), 5);
+            }
         }
         checkShouldEnd(game);
     }
@@ -199,6 +225,7 @@ public class TerritoryModule extends TeamWinHandler {
             game.getDamageManager().respawn(player);
             game.getKitManager().getKit(player).giveItems(player);
             player.teleport(territory.getCenterLocation().clone().add(0, 1, 0));
+            Bukkit.getPluginManager().callEvent(new TerritoryRespawnEvent(player, territory));
         } else {
             checkShouldEnd(game);
         }
@@ -234,12 +261,22 @@ public class TerritoryModule extends TeamWinHandler {
             
             if (score >= targetScore - 100 && !hundredShown && targetScore >= 200) {
                 hundredShown = true;
+                for (Player other : Bukkit.getOnlinePlayers()) {
+                    other.playSound(other.getLocation(), Sound.GHAST_MOAN, 1f, 1f);
+                }
                 TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
-                        "100 points to win");
+                        "100 points to win", 2, 10, 2);
+                Bukkit.broadcastMessage(team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                        "has " + MessageUtil.VARIABLE + "100" + MessageUtil.DEFAULT + " points to win.");
             } else if (score >= targetScore - 10 && !tenShown && targetScore >= 20) {
                 tenShown = true;
+                for (Player other : Bukkit.getOnlinePlayers()) {
+                    other.playSound(other.getLocation(), Sound.GHAST_MOAN, 1f, 1f);
+                }
                 TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
-                        "10 points to win");
+                        "10 points to win", 2, 10, 2);
+                Bukkit.broadcastMessage(team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                        "has " + MessageUtil.VARIABLE + "10" + MessageUtil.DEFAULT + " points to win.");
             }
     
             if (score >= targetScore) {

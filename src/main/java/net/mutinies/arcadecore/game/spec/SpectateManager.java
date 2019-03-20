@@ -68,6 +68,12 @@ public class SpectateManager implements Module {
         setSpectateState(player);
     }
     
+    public void spectatePlayer(Player player, boolean teleport) {
+        spectators.add(player.getUniqueId());
+        hidePlayer(player);
+        setSpectateState(player, teleport);
+    }
+    
     public void unspectatePlayer(Player player) {
         setRunningState(player);
         showPlayer(player);
@@ -89,21 +95,31 @@ public class SpectateManager implements Module {
     }
     
     private void setSpectateState(Player player) {
-        player.setGameMode(GameMode.ADVENTURE);
+        setSpectateState(player, true);
+    }
+    
+    private void setSpectateState(Player player, boolean teleport) {
         player.setAllowFlight(true);
         player.setFlying(true);
+        player.setGameMode(GameMode.ADVENTURE);
         player.setLevel(0);
         player.setLastDamageCause(null);
         player.setLastDamage(0);
         player.setMaxHealth(20);
         player.setHealth(20);
+        player.setExp(0);
 //        player.getInventory().setContents(new ItemStack[36]);
-        player.teleport(game.getMapManager().getCurrentMap().getMainSpawn().getLocation());
-        player.setVelocity(new Vector(0, 0, 0));
+        if (teleport) {
+            player.teleport(game.getMapManager().getCurrentMap().getMainSpawn().getLocation());
+            player.setVelocity(new Vector(0, 0, 0));
+        } else {
+            player.setVelocity(new Vector(0, 1, 0));
+        }
         for (PotionEffect effect : new ArrayList<>(player.getActivePotionEffects())) {
             player.removePotionEffect(effect.getType());
         }
-        player.setExp(0);
+        player.setAllowFlight(true);
+        player.setFlying(true);
     }
     
     private void setRunningState(Player player) {

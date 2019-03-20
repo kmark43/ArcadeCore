@@ -221,7 +221,7 @@ public class DefaultDamageManager implements DamageManager {
         Location deathLocation = player.getLocation();
         
         deadPlayers.add(player.getUniqueId());
-        game.getSpectateManager().spectatePlayer(player);
+        game.getSpectateManager().spectatePlayer(player, false);
     
         LinkedList<DamageInstance> damageInstances = damageTracking.get(player.getUniqueId());
         DamageInstance lastDamage = damageInstances == null || damageInstances.isEmpty() ? null : damageInstances.getFirst();

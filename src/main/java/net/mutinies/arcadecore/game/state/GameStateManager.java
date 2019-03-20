@@ -13,6 +13,7 @@ import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.modules.prevent.NoDamageModule;
 import net.mutinies.arcadecore.modules.prevent.NoHungerChangeModule;
 import net.mutinies.arcadecore.modules.prevent.NoInteractModule;
+import net.mutinies.arcadecore.util.MessageUtil;
 import net.mutinies.arcadecore.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -121,6 +122,7 @@ public class GameStateManager {
                 game.getKitManager().setDefaultKits();
                 teleportPlayersToGame();
                 game.getKitManager().giveKitSelectionItems();
+                displayGameStartMessage();
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.RUNNING), 20 * freezeDelay);
                 break;
             case RUNNING:
@@ -140,6 +142,12 @@ public class GameStateManager {
         }
         
         Bukkit.getPluginManager().callEvent(new GameStateSetEvent(game, oldState, state));
+    }
+    
+    private void displayGameStartMessage() {
+        String currentMapName = game.getMapManager().getCurrentMap().getDisplayName();
+        Bukkit.broadcastMessage("");
+        MessageUtil.broadcast("Game", MessageUtil.CATEGORY + "Map" + MessageUtil.SEPARATOR + " - " + MessageUtil.VARIABLE + currentMapName);
     }
     
     private List<Module> getKitModules() {
