@@ -19,6 +19,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
@@ -30,7 +33,7 @@ import java.util.stream.Collectors;
 import static net.mutinies.arcadecore.util.ModuleUtil.disableModules;
 import static net.mutinies.arcadecore.util.ModuleUtil.enableModules;
 
-public class GameStateManager {
+public class GameStateManager implements Module {
     public enum GameState {
         NOT_ACTIVE, STARTING, RUNNING, ENDING
     }
@@ -49,7 +52,7 @@ public class GameStateManager {
         this.game = game;
         state = GameState.NOT_ACTIVE;
         
-        generalModules = Arrays.asList(game.getSpectateManager(), game.getDamageManager(), game.getTeamManager(), game.getKitManager(), game.getProjectileManager(), game.getScoreboardManager());
+        generalModules = Arrays.asList(this, game.getSpectateManager(), game.getDamageManager(), game.getTeamManager(), game.getKitManager(), game.getProjectileManager(), game.getScoreboardManager());
         startModules = Arrays.asList(new NoInteractModule(), new NoDamageModule(), new NoHungerChangeModule());
         runningModules = Arrays.asList();
         endingModules = Arrays.asList();
@@ -190,6 +193,18 @@ public class GameStateManager {
             player.setFlying(true);
             player.teleport(loc);
             clearInventory(player);
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerChangeWorlds(PlayerChangedWorldEvent e) {
+        if (state == GameState.STARTING) {
+            Player player = e.getPlayer();
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            player.setGameMode(GameMode.ADVENTURE);
+            player.setAllowFlight(true);
+            player.setFlying(true);
         }
     }
     
