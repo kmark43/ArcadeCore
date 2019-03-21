@@ -26,7 +26,7 @@ public class ItemBuilder {
     private ItemStack stack;
     
     public ItemBuilder(ItemStack stack) {
-        this.stack = Objects.requireNonNull(stack);
+        this.stack = stack.clone();
     }
     
     public ItemBuilder name(String name) {

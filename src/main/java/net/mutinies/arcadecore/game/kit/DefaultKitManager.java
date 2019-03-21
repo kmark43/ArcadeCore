@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -50,13 +51,28 @@ public class DefaultKitManager implements KitManager {
     
     @Override
     public void showGameKitGui(Player player) {
-        InventoryWindow window = new InventoryWindow(ChatColor.GRAY + "Kits");
-        for (int i = 0; i < kits.size(); i++) {
-            int j = i;
-            window.set(i, new WindowButton(ItemBuilder.of(kits.get(j).getRepresentingStack()).name(kits.get(j).getDisplayName()).build(), clickEvent -> {
-                setKit(player, kits.get(j));
+        InventoryWindow window = new InventoryWindow(ChatColor.DARK_GRAY + "Kits");
+        int r = 1;
+        int c = 1;
+        for (Kit kit : kits) {
+            ItemBuilder builder = ItemBuilder.of(kit.getRepresentingStack());
+            if (getKit(player).equals(kit)) {
+                builder.name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Selected Kit"  + ChatColor.DARK_GRAY + ": " + ChatColor.WHITE + kit.getDisplayName());
+                builder.glow();
+            } else {
+                builder.name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Select " + ChatColor.WHITE + kit.getDisplayName());
+            }
+            builder.setFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+            window.set(r * 9 + c, new WindowButton(builder.build(), clickEvent -> {
+                setKit(player, kit);
                 giveKitSelectionItem(player);
+                showGameKitGui(player);
             }));
+            c++;
+            if (c >= 8) {
+                c = 1;
+                r++;
+            }
         }
         window.show(player);
     }
@@ -86,7 +102,12 @@ public class DefaultKitManager implements KitManager {
     @Override
     public void giveKitSelectionItem(Player player) {
         Kit kit = game.getKitManager().getKit(player);
-        ItemStack kitStack = ItemManager.tag(kit.getRepresentingStack(), "select_kit");
+        ItemBuilder builder = ItemBuilder.of(kit.getRepresentingStack());
+        builder.name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Selected Kit"  + ChatColor.DARK_GRAY + ": " + ChatColor.WHITE + kit.getDisplayName());
+        builder.unbreakable();
+        builder.setFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+        
+        ItemStack kitStack = ItemManager.tag(builder.build(), "select_kit");
         player.getInventory().setItem(0, kitStack);
     }
     

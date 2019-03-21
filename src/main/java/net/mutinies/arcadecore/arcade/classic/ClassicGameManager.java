@@ -292,7 +292,7 @@ public class ClassicGameManager implements GameManager {
         if (getMap() != null) {
             GameTeam queuedTeam = getGame().getTeamManager().getQueuedTeam(player);
             List<String> teamNames = getMap().getParsedTeams();
-            InventoryWindow window = new InventoryWindow(ChatColor.GRAY + "Queue Team");
+            InventoryWindow window = new InventoryWindow(ChatColor.DARK_GRAY + "Queue Team");
             int c = 1;
             int r = 1;
     
