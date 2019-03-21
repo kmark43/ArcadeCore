@@ -179,7 +179,7 @@ public class TerritoryModule extends TeamWinHandler {
                 respawnPlayer(player);
             }
         }
-        Bukkit.broadcastMessage(e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
+        MessageUtil.broadcast("Game", e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
                 "has " + MessageUtil.VARIABLE + "claimed" + MessageUtil.DEFAULT + " a territory");
     
         for (Player other : Bukkit.getOnlinePlayers()) {
@@ -195,8 +195,8 @@ public class TerritoryModule extends TeamWinHandler {
         GameTeam team = e.getTeam();
         List<Territory> territories = getClaimedTerritories(e.getTeam());
     
-        Bukkit.broadcastMessage(e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
-                "has " + MessageUtil.VARIABLE + "lost" + " a territory");
+        MessageUtil.broadcast("Game", e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                "has " + MessageUtil.VARIABLE + "lost" + MessageUtil.DEFAULT + " a territory");
         
         if (territories.isEmpty()) {
             for (Player other : Bukkit.getOnlinePlayers()) {
@@ -205,8 +205,8 @@ public class TerritoryModule extends TeamWinHandler {
             
             TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
                     "is in the " + ChatColor.DARK_RED + "Danger Zone", 2, 10, 2);
-            
-            Bukkit.broadcastMessage("" + team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
+    
+            MessageUtil.broadcast("Game", "" + team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
                     "is in the " + ChatColor.DARK_RED + "Danger Zone");
         } else {
             for (Player other : Bukkit.getOnlinePlayers()) {
@@ -266,7 +266,7 @@ public class TerritoryModule extends TeamWinHandler {
                 }
                 TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
                         "100 points to win", 2, 10, 2);
-                Bukkit.broadcastMessage(team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                MessageUtil.broadcast("Game", team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
                         "has " + MessageUtil.VARIABLE + "100" + MessageUtil.DEFAULT + " points to win.");
             } else if (score >= targetScore - 10 && !tenShown && targetScore >= 20) {
                 tenShown = true;
@@ -275,7 +275,7 @@ public class TerritoryModule extends TeamWinHandler {
                 }
                 TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
                         "10 points to win", 2, 10, 2);
-                Bukkit.broadcastMessage(team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                MessageUtil.broadcast("Game", team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
                         "has " + MessageUtil.VARIABLE + "10" + MessageUtil.DEFAULT + " points to win.");
             }
     

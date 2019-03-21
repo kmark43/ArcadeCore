@@ -67,12 +67,12 @@ public class TeamManager implements Module {
             boolean showEnemyNametags = (boolean)game.getConfigManager().getProperty("show_enemy_nametags").getValue();
             boolean showAllyNametags = (boolean)game.getConfigManager().getProperty("show_ally_nametags").getValue();
             
-            if (showAllyNametags && !showEnemyNametags) {
-                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
-            } else if (!showAllyNametags && showEnemyNametags) {
-                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
-            } else if (!showAllyNametags && !showEnemyNametags) {
+            if (!showAllyNametags && !showEnemyNametags) {
                 scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.NEVER);
+            } else if (!showAllyNametags) {
+                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
+            } else if (!showEnemyNametags) {
+                scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
             } else {
                 scoreboard.getTeam(team.getName()).setNameTagVisibility(NameTagVisibility.ALWAYS);
             }

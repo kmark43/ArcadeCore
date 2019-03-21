@@ -70,7 +70,7 @@ public class GameMaker {
         paintballMaker.addModule("territory_claim", new PaintingTerritoryClaimModule(paintball, territoryModule));
         paintballMaker.addModule("prevent_territory_paint", new PreventTerritoryPaintModule(territoryModule));
         paintballMaker.addModule("give_potion_module", new GivePotionOnKillModule(paintballMaker.getReviveModule()));
-        paintballMaker.addModule("spawn_protection", new SpawnProtectionOnTerritoryRespawnModule(paintball, 10));
+        paintballMaker.addModule("spawn_protection", new SpawnProtectionOnTerritoryRespawnModule(paintball, 20));
         paintballMaker.applyKitsAndModules();
 
         ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
