@@ -163,6 +163,7 @@ public class ReviveModule implements Module {
                 if (game.getTeamManager().getTeam(player).equals(game.getTeamManager().getTeam(target))) {
                     entity.remove();
                     game.getDamageManager().respawn(target);
+                    target.setVelocity(new Vector(0, 0, 0));
                     target.teleport(entity);
                     armorStandMap.remove(entity);
                     Bukkit.getPluginManager().callEvent(new GameReviveEvent(target));

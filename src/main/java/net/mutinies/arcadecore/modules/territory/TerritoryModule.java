@@ -181,6 +181,9 @@ public class TerritoryModule extends TeamWinHandler {
         }
         MessageUtil.broadcast("Game", e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
                 "has " + MessageUtil.VARIABLE + "claimed" + MessageUtil.DEFAULT + " a territory");
+        for (Player player : players) {
+            TitleUtil.sendTitle(player, "", "You captured a territory", 2, 10, 2);
+        }
     
         for (Player other : Bukkit.getOnlinePlayers()) {
             other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, 1f);
@@ -193,10 +196,15 @@ public class TerritoryModule extends TeamWinHandler {
     public void onTerritoryUnclaim(TerritoryUnclaimEvent e) {
         if (game.getGameStateManager().getState() != GameStateManager.GameState.RUNNING) return;
         GameTeam team = e.getTeam();
+        Set<UUID> uuids = team.getPlayers();
+        List<Player> players = uuids.stream().map(Bukkit::getPlayer).filter(Objects::nonNull).collect(Collectors.toList());
         List<Territory> territories = getClaimedTerritories(e.getTeam());
     
         MessageUtil.broadcast("Game", e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
                 "has " + MessageUtil.VARIABLE + "lost" + MessageUtil.DEFAULT + " a territory");
+        for (Player player : players) {
+            TitleUtil.sendTitle(player, "", "You lost a territory", 2, 10, 2);
+        }
         
         if (territories.isEmpty()) {
             for (Player other : Bukkit.getOnlinePlayers()) {

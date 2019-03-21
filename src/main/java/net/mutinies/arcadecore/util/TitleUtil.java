@@ -8,9 +8,6 @@ import org.bukkit.entity.Player;
 
 public class TitleUtil {
     public static void broadcastTitle(String title, String subtitle) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            sendTitle(player, title, subtitle);
-        }
         broadcastTitle(title, subtitle, 5, 40, 5);
     }
     public static void broadcastTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
@@ -20,7 +17,7 @@ public class TitleUtil {
     }
     
     public static void sendTitle(Player player, String title, String subtitle) {
-        ((CraftPlayer) player).sendTitle(title, subtitle);
+        sendTitle(player, title, subtitle, 5, 40, 5);
     }
     
     public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
