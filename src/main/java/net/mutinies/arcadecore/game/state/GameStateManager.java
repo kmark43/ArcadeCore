@@ -15,7 +15,9 @@ import net.mutinies.arcadecore.modules.prevent.NoHungerChangeModule;
 import net.mutinies.arcadecore.modules.prevent.NoInteractModule;
 import net.mutinies.arcadecore.util.MessageUtil;
 import net.mutinies.arcadecore.util.PlayerUtil;
+import net.mutinies.arcadecore.util.TitleUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -151,6 +153,7 @@ public class GameStateManager implements Module {
         String currentMapName = game.getMapManager().getCurrentMap().getDisplayName();
         Bukkit.broadcastMessage("");
         MessageUtil.broadcast("Game", MessageUtil.CATEGORY + "Map" + MessageUtil.SEPARATOR + " - " + MessageUtil.VARIABLE + currentMapName);
+        TitleUtil.broadcastTitle("" + ChatColor.LIGHT_PURPLE + game.getDisplayName(), game.getMapManager().getCurrentMap().getDisplayName());
     }
     
     private List<Module> getKitModules() {
