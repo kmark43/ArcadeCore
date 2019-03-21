@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class MessageUtil {
     public static String DEFAULT = "" + ChatColor.GRAY;
-    public static String ERROR = "" + ChatColor.DARK_BLUE;
+    public static String ERROR = "" + ChatColor.BLUE;
     public static String CATEGORY = "" + ChatColor.WHITE;
     public static String VARIABLE = "" + ChatColor.LIGHT_PURPLE;
     public static String SEPARATOR = "" + ChatColor.DARK_GRAY;
