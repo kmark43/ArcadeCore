@@ -183,7 +183,7 @@ public class TerritoryModule extends TeamWinHandler {
         MessageUtil.broadcast("Game", e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
                 "has " + MessageUtil.VARIABLE + "claimed" + MessageUtil.DEFAULT + " a territory");
         for (Player player : players) {
-            TitleUtil.sendTitle(player, "", "You captured a territory", 2, 10, 2);
+            TitleUtil.sendTitle(player, "", ChatColor.GREEN + "Territory Captured", 2, 10, 2);
         }
     
         for (Player other : Bukkit.getOnlinePlayers()) {
@@ -204,7 +204,7 @@ public class TerritoryModule extends TeamWinHandler {
         MessageUtil.broadcast("Game", e.getTeam().getColor().getChatColor() + e.getTeam().getDisplayName() + " Team " + MessageUtil.DEFAULT +
                 "has " + MessageUtil.VARIABLE + "lost" + MessageUtil.DEFAULT + " a territory");
         for (Player player : players) {
-            TitleUtil.sendTitle(player, "", "You lost a territory", 2, 10, 2);
+            TitleUtil.sendTitle(player, "", ChatColor.RED + "Territory Lost", 2, 10, 2);
         }
         
         if (territories.isEmpty()) {
@@ -213,7 +213,7 @@ public class TerritoryModule extends TeamWinHandler {
             }
             
             TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
-                    "is in the " + ChatColor.DARK_RED + "Danger Zone", 2, 10, 2);
+                    "is in the " + ChatColor.DARK_RED + "Danger Zone", 2, 20, 2);
     
             MessageUtil.broadcast("Game", "" + team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
                     "is in the " + ChatColor.DARK_RED + "Danger Zone");
@@ -274,7 +274,7 @@ public class TerritoryModule extends TeamWinHandler {
                     other.playSound(other.getLocation(), Sound.GHAST_MOAN, 1f, 1f);
                 }
                 TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
-                        "100 points to win", 2, 10, 2);
+                        "100 points to win", 2, 20, 2);
                 MessageUtil.broadcast("Game", team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
                         "has " + MessageUtil.VARIABLE + "100" + MessageUtil.DEFAULT + " points to win.");
             } else if (score >= targetScore - 10 && !tenShown && targetScore >= 20) {
@@ -283,7 +283,7 @@ public class TerritoryModule extends TeamWinHandler {
                     other.playSound(other.getLocation(), Sound.GHAST_MOAN, 1f, 1f);
                 }
                 TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
-                        "10 points to win", 2, 10, 2);
+                        "10 points to win", 2, 20, 2);
                 MessageUtil.broadcast("Game", team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
                         "has " + MessageUtil.VARIABLE + "10" + MessageUtil.DEFAULT + " points to win.");
             }

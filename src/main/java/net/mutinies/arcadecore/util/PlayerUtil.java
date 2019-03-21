@@ -18,6 +18,7 @@ public class PlayerUtil {
         player.setLastDamage(0);
         player.setMaxHealth(20);
         player.setHealth(20);
+        player.setFoodLevel(20);
         for (PotionEffect effect : new ArrayList<>(player.getActivePotionEffects())) {
             player.removePotionEffect(effect.getType());
         }

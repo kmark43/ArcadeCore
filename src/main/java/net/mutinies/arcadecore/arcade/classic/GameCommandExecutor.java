@@ -60,7 +60,8 @@ public class GameCommandExecutor implements CommandExecutor, TabCompleter {
                     } else {
                         if (arcadeManager.hasGame(args[1])) {
                             gameManager.setGame(args[1]);
-                            MessageUtil.send(sender,"Set game to " + args[1]);
+                            Game game = arcadeManager.getGame(args[1]);
+                            MessageUtil.send(sender,"Set game to " + MessageUtil.VARIABLE + game.getDisplayName());
                         } else {
                             MessageUtil.sendError(sender,"Game not found");
                         }

@@ -22,7 +22,7 @@ public class MapCommandExecutor implements CommandExecutor, TabCompleter {
             if (!gameManager.isGameRunning()) {
                 if (gameManager.getGame().getMapManager().getMap(args[0]) != null) {
                     gameManager.setMap(args[0]);
-                    MessageUtil.send(sender,"Set map to " + args[0]);
+                    MessageUtil.send(sender,"Set map to " + MessageUtil.VARIABLE + args[0]);
                 } else {
                     MessageUtil.sendError(sender,"Map not found");
                 }
