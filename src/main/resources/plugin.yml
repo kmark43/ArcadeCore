@@ -7,6 +7,7 @@ depend: [ProtocolLib]
 commands:
   game:
     description: Manages the current game
+    permission: mutinies.arcadecore.game
     usage: |
       /game start
       /game stop
@@ -22,10 +23,13 @@ commands:
     description: Lists the available game
   spec:
     description: Toggles spectator mode
+    permission: mutinies.arcadecore.spec
   map:
     description: Sets current game map
+    permission: mutinies.arcadecore.map
   config:
     description: Change the current game's configuration
+    permission: mutinies.arcadecore.config
   pause:
     description: Change the current game's configuration
     permission: mutinies.arcadecore.pause
@@ -34,5 +38,13 @@ permissions:
   mutinies.arcadecore.*:
     children:
       mutinies.arcadecore.pause: true
+  mutinies.arcadecore.game:
+    default: op
+  mutinies.arcadecore.map:
+    default: op
+  mutinies.arcadecore.config:
+    default: op
   mutinies.arcadecore.pause:
     default: op
+  mutinies.arcadecore.spec:
+    default: true
