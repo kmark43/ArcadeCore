@@ -11,6 +11,7 @@ import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
+import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.games.paintball.event.territory.TerritoryRespawnEvent;
@@ -299,10 +300,11 @@ public class TerritoryModule extends TeamWinHandler {
     }
     
     private void parseTerritories() {
-        JsonObject rootObject = game.getMapManager().getCurrentMap().getRootObject();
+        GameMap currentMap = game.getMapManager().getCurrentMap();
+        JsonObject rootObject = currentMap.getRootObject();
         JsonArray territoryArray = rootObject.get("territories").getAsJsonArray();
         for (JsonElement territory : territoryArray) {
-            Location location = JsonUtil.parseLocation(territory.getAsJsonObject()).subtract(0, 1, 0);
+            Location location = JsonUtil.parseLocation(territory.getAsJsonObject(), currentMap.getWorld()).subtract(0, 1, 0);
             territories.add(new Territory(location));
         }
     }
