@@ -150,10 +150,11 @@ public class GameStateManager implements Module {
     }
     
     private void displayGameStartMessage() {
+        int freezeDelay = ArcadeCorePlugin.getInstance().getConfig().getInt("freezeDelay");
         String currentMapName = game.getMapManager().getCurrentMap().getDisplayName();
         Bukkit.broadcastMessage("");
         MessageUtil.broadcast("Game", MessageUtil.CATEGORY + "Map" + MessageUtil.SEPARATOR + " - " + MessageUtil.VARIABLE + currentMapName);
-        TitleUtil.broadcastTitle("" + ChatColor.LIGHT_PURPLE + game.getDisplayName(), game.getMapManager().getCurrentMap().getDisplayName());
+        TitleUtil.broadcastTitle("" + ChatColor.LIGHT_PURPLE + game.getDisplayName(), game.getMapManager().getCurrentMap().getDisplayName(), 5, freezeDelay * 20, 15);
     }
     
     private List<Module> getKitModules() {
