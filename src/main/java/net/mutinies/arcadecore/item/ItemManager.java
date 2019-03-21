@@ -2,6 +2,7 @@ package net.mutinies.arcadecore.item;
 
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.NBTTagString;
+import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.manager.Manager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -21,18 +22,22 @@ import java.util.*;
 
 public class ItemManager implements Manager {
     private Map<String, ClickHandler> clickHandlerMap;
+    private Set<Material> updateRequiredMaterial;
     
     private Set<UUID> justCalled;
     
     @Override
     public void enable() {
         justCalled = new HashSet<>();
+        updateRequiredMaterial = new HashSet<>();
         clickHandlerMap = new HashMap<>();
+        populateUpdateRequiredMaterial();
     }
     
     @Override
     public void disable() {
         justCalled = null;
+        updateRequiredMaterial = null;
         clickHandlerMap = null;
     }
     
@@ -101,6 +106,25 @@ public class ItemManager implements Manager {
         }
     }
     
+    private void populateUpdateRequiredMaterial() {
+        updateRequiredMaterial.add(Material.LEATHER_HELMET);
+        updateRequiredMaterial.add(Material.LEATHER_CHESTPLATE);
+        updateRequiredMaterial.add(Material.LEATHER_LEGGINGS);
+        updateRequiredMaterial.add(Material.LEATHER_BOOTS);
+        updateRequiredMaterial.add(Material.IRON_HELMET);
+        updateRequiredMaterial.add(Material.IRON_CHESTPLATE);
+        updateRequiredMaterial.add(Material.IRON_LEGGINGS);
+        updateRequiredMaterial.add(Material.IRON_BOOTS);
+        updateRequiredMaterial.add(Material.GOLD_HELMET);
+        updateRequiredMaterial.add(Material.GOLD_CHESTPLATE);
+        updateRequiredMaterial.add(Material.GOLD_LEGGINGS);
+        updateRequiredMaterial.add(Material.GOLD_BOOTS);
+        updateRequiredMaterial.add(Material.DIAMOND_HELMET);
+        updateRequiredMaterial.add(Material.DIAMOND_CHESTPLATE);
+        updateRequiredMaterial.add(Material.DIAMOND_LEGGINGS);
+        updateRequiredMaterial.add(Material.DIAMOND_BOOTS);
+    }
+    
     @EventHandler
     public void onItemClick(ClickEvent e) {
         String tag = getTag(e.getItem());
@@ -131,6 +155,9 @@ public class ItemManager implements Manager {
             Bukkit.getPluginManager().callEvent(clickEvent);
             if (clickEvent.isCancelled()) {
                 e.setCancelled(true);
+                if (e.getItem() != null && updateRequiredMaterial.contains(e.getItem().getType())) {
+                    Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> e.getPlayer().updateInventory(), 40);
+                }
             }
         }
     }

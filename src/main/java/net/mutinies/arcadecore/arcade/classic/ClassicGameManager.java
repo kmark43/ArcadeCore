@@ -12,18 +12,30 @@ import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.map.LobbyMap;
 import net.mutinies.arcadecore.game.scoreboard.ScoreboardManager;
+import net.mutinies.arcadecore.game.team.GameTeam;
+import net.mutinies.arcadecore.graphics.inventory.InventoryWindow;
+import net.mutinies.arcadecore.graphics.inventory.WindowButton;
+import net.mutinies.arcadecore.graphics.inventory.event.ClickHandler;
+import net.mutinies.arcadecore.item.ClickEvent;
+import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.modules.prevent.*;
+import net.mutinies.arcadecore.util.ItemBuilder;
+import net.mutinies.arcadecore.util.MessageUtil;
 import net.mutinies.arcadecore.util.ModuleUtil;
 import net.mutinies.arcadecore.util.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
@@ -84,6 +96,15 @@ public class ClassicGameManager implements GameManager {
             return lines;
         });
     
+        ItemManager itemManager = ArcadeCorePlugin.getManagerHandler().getManager(ItemManager.class);
+        itemManager.registerTag("queue_team", clickEvent -> {
+            if (clickEvent.getClickType() == ClickEvent.ClickType.RIGHT) {
+                clickEvent.setCancelled(true);
+                clickEvent.getPlayer().updateInventory();
+                Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> showTeamQueueingGui(clickEvent.getPlayer()));
+            }
+        });
+    
         Bukkit.getPluginManager().registerEvents(scoreboardManager, ArcadeCorePlugin.getInstance());
         
         File lobbyMapFile = new File(ArcadeCorePlugin.getInstance().getDataFolder(), "/lobby.json");
@@ -140,6 +161,9 @@ public class ClassicGameManager implements GameManager {
             scoreboardManager.disable();
             HandlerList.unregisterAll(scoreboardManager);
         }
+    
+        ItemManager itemManager = ArcadeCorePlugin.getManagerHandler().getManager(ItemManager.class);
+        itemManager.unregister("queue_team");
         participationManager = null;
     }
     
@@ -147,6 +171,9 @@ public class ClassicGameManager implements GameManager {
         scoreboardManager.enable();
         scoreboardManager.setTitle(ChatColor.BOLD + "Waiting for players");
         updateCountdownTask();
+        if (activeGame != null) {
+            activeGame.getKitManager().setDefaultKits();
+        }
         for (Player player : Bukkit.getOnlinePlayers()) {
             initLobbyPlayer(player, false);
         }
@@ -163,8 +190,8 @@ public class ClassicGameManager implements GameManager {
     private void initLobbyPlayer(Player player, boolean teleport) {
         PlayerUtil.setDefaultPlayerState(player);
         if (getGame() != null) {
-            getGame().getKitManager().setDefaultKits();
-            getGame().getKitManager().giveKitSelectionItems();
+            getGame().getKitManager().giveKitSelectionItem(player);
+            giveTeamQueuingItem(player);
         }
         if (!isGameRunning()) {
             if (teleport) {
@@ -239,11 +266,98 @@ public class ClassicGameManager implements GameManager {
     
     private void updateCountdown() {
         timeLeft--;
-//        scoreboardManager.setTitle(ChatColor.BOLD + "" + timeLeft + " Seconds Left");
         scoreboardManager.setTitle(ChatColor.BOLD + "Starting in " + timeLeft + " seconds");
         if (timeLeft <= 0) {
             stopCountdown();
             startGame();
+        }
+    }
+    
+    private void giveTeamQueuingItem(Player player) {
+        GameTeam queuedTeam = getGame().getTeamManager().getQueuedTeam(player);
+        String teamName = queuedTeam != null ? queuedTeam.getColor().getChatColor() + queuedTeam.getDisplayName() : ChatColor.WHITE + "None";
+        Color armorColor = queuedTeam != null ? queuedTeam.getColor().getColor() : Color.BLACK;
+        
+        ItemStack stack = ItemBuilder.of(Material.LEATHER_CHESTPLATE)
+                .name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Queued Team" + ChatColor.DARK_GRAY + ": " + teamName)
+                .applyMetaChange(meta -> ((LeatherArmorMeta)meta).setColor(armorColor))
+                .build();
+        
+        stack = ItemManager.tag(stack, "queue_team");
+        
+        player.getInventory().setItem(8, stack);
+    }
+    
+    private void showTeamQueueingGui(Player player) {
+        if (getMap() != null) {
+            GameTeam queuedTeam = getGame().getTeamManager().getQueuedTeam(player);
+            List<String> teamNames = getMap().getParsedTeams();
+            InventoryWindow window = new InventoryWindow(ChatColor.GRAY + "Queue Team");
+            int c = 1;
+            int r = 1;
+    
+            {
+                ItemBuilder builder = ItemBuilder.of(Material.LEATHER_CHESTPLATE)
+                        .applyMetaChange(meta -> ((LeatherArmorMeta) meta).setColor(Color.BLACK));
+    
+                if (queuedTeam == null) {
+                    builder.name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Queued Team" + ChatColor.DARK_GRAY + ": " + ChatColor.RESET + "None");
+                    builder.glow();
+                } else {
+                    builder.name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Unqueue Team");
+                }
+    
+                ItemStack stack = builder.build();
+    
+                window.set(9 * r + c, new WindowButton(stack, (ClickHandler) e -> {
+                    if (getGame().getTeamManager().getQueuedTeam(player) != null) {
+                        getGame().getTeamManager().removeQueuedTeam(player);
+                        MessageUtil.send(player, "Game", "You are no longer queued for a team");
+                    }
+                    showTeamQueueingGui(player);
+                    giveTeamQueuingItem(player);
+                }));
+    
+                c++;
+                if (c >= 8) {
+                    r++;
+                    c = 1;
+                }
+            }
+            
+            for (String teamName : teamNames) {
+                GameTeam team = getGame().getTeamManager().getTeam(teamName);
+                
+                ItemBuilder builder = ItemBuilder.of(Material.LEATHER_CHESTPLATE)
+                        .applyMetaChange(meta -> ((LeatherArmorMeta) meta).setColor(team.getColor().getColor()));
+                
+                if (queuedTeam != null && queuedTeam.equals(team)) {
+                    builder.name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Queued Team" + ChatColor.DARK_GRAY + ": " + team.getColor().getChatColor() + team.getDisplayName());
+                    builder.glow();
+                } else {
+                    builder.name("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Select Team " + team.getColor().getChatColor() + team.getDisplayName());
+                }
+                
+    
+                ItemStack stack = builder.build();
+                
+                window.set(9 * r + c, new WindowButton(stack, (ClickHandler) e -> {
+                    int position = getGame().getTeamManager().queueTeam(player, team) + 1;
+                    int size = getGame().getTeamManager().getQueued(team).size();
+                    
+                    MessageUtil.send(player, "Game", "You are " + ChatColor.DARK_GRAY + position + ChatColor.GRAY + "/" + ChatColor.DARK_GRAY + size + MessageUtil.DEFAULT + " in queue for " + team.getColor().getChatColor() + team.getDisplayName());
+                    showTeamQueueingGui(player);
+                    giveTeamQueuingItem(player);
+                }));
+                
+                c++;
+                if (c >= 8) {
+                    r++;
+                    c = 1;
+                }
+            }
+            window.addCloseHandler(e -> Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), player::updateInventory));
+            window.show(player);
         }
     }
     
@@ -306,6 +420,7 @@ public class ClassicGameManager implements GameManager {
             chooseRandomMap();
             updateCountdownTask();
             
+            activeGame.getKitManager().setDefaultKits();
             for (Player player : Bukkit.getOnlinePlayers()) {
                 initLobbyPlayer(player, false);
             }

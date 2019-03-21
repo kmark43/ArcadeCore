@@ -1,6 +1,7 @@
 package net.mutinies.arcadecore.game.team;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
+import net.mutinies.arcadecore.event.PlayerQueueTeamEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
@@ -16,6 +17,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TeamManager implements Module {
     private Game game;
@@ -26,9 +28,12 @@ public class TeamManager implements Module {
     private List<GameTeam> teams;
     private Scoreboard scoreboard;
     
+    private Map<String, Set<UUID>> queued;
+    
     public TeamManager(Game game) {
         this.game = game;
         teamMap = new HashMap<>();
+        queued = new HashMap<>();
         teams = new ArrayList<>();
     
         createTeam("players", "Players", MutiniesColor.PURPLE);
@@ -103,11 +108,37 @@ public class TeamManager implements Module {
         List<Player> players = new ArrayList<>(ArcadeCorePlugin.getParticipants());
         Collections.shuffle(players);
         
-        int i = 0;
+        int maxTeamSize = (int)Math.ceil((double)players.size() / assignableTeams.size());
+        for (GameTeam team : assignableTeams) {
+            Set<UUID> toAdd = queued.get(team.getName());
+            if (toAdd == null) continue;
+            Iterator<UUID> queue = toAdd.iterator();
+            for (int i = 0; i < maxTeamSize && queue.hasNext(); i++) {
+                Player player;
+                
+                do {
+                    player = Bukkit.getPlayer(queue.next());
+                } while (player == null && queue.hasNext());
+                
+                if (player != null) {
+                    setTeam(player, team);
+                }
+            }
+        }
+        
+        queued.clear();
         
         for (Player player : players) {
-            setTeam(player, assignableTeams.get(i % assignableTeams.size()));
-            i++;
+            if (getTeam(player) != null) continue;
+            GameTeam smallestTeam = null;
+            int smallestNumPlayers = 0;
+            for (GameTeam team : assignableTeams) {
+                if (team.getPlayers().size() <= smallestNumPlayers) {
+                    smallestNumPlayers = team.getPlayers().size();
+                    smallestTeam = team;
+                }
+            }
+            setTeam(player, smallestTeam);
         }
     }
     
@@ -146,6 +177,67 @@ public class TeamManager implements Module {
         }
     }
     
+    public Set<Player> getQueued(GameTeam team) {
+        Set<UUID> uuids = queued.get(team.getName());
+        if (uuids == null) {
+            return new HashSet<>();
+        } else {
+            return uuids.stream().map(Bukkit::getPlayer).collect(Collectors.toSet());
+        }
+    }
+    
+    public GameTeam getQueuedTeam(Player player) {
+        for (String teamName : queued.keySet()) {
+            Set<UUID> uuids = queued.get(teamName);
+            if (uuids.contains(player.getUniqueId())) {
+                return getTeam(teamName);
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Queues the given player for the given team
+     * @param player The player to queue
+     * @return The index the player has in this team
+     */
+    public int queueTeam(Player player, GameTeam team) {
+        if (!queued.containsKey(team.getName())) {
+            queued.put(team.getName(), new LinkedHashSet<>());
+        }
+        Set<UUID> uuids = queued.get(team.getName());
+        if (uuids.contains(player.getUniqueId())) {
+            int i = 0;
+            for (UUID uuid : uuids) {
+                if (player.getUniqueId().equals(uuid)) {
+                    return i;
+                }
+                i++;
+            }
+            return -1; // should never reach here
+        } else {
+            removeQueuedTeam(player);
+            uuids.add(player.getUniqueId());
+            Bukkit.getPluginManager().callEvent(new PlayerQueueTeamEvent(player, team, uuids.size(), uuids.size()));
+            return uuids.size() - 1;
+        }
+    }
+    
+    public void removeQueuedTeam(Player player) {
+        Iterator<String> teamNameIterator = queued.keySet().iterator();
+        while (teamNameIterator.hasNext()) {
+            String teamName = teamNameIterator.next();
+            Set<UUID> uuids = queued.get(teamName);
+            if(uuids.contains(player.getUniqueId())) {
+                uuids.remove(player.getUniqueId());
+                Bukkit.getPluginManager().callEvent(new PlayerQueueTeamEvent(player, getTeam(teamName), uuids.size(), uuids.size()));
+                if (uuids.isEmpty()) {
+                    teamNameIterator.remove();
+                }
+            }
+        }
+    }
+    
     public List<GameTeam> getTeamsWithPlayers() {
         List<GameTeam> teams = new ArrayList<>();
         for (GameTeam team : this.teams) {
@@ -177,5 +269,6 @@ public class TeamManager implements Module {
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerQuit(PlayerQuitEvent e) {
         setTeam(e.getPlayer(), null);
+        removeQueuedTeam(e.getPlayer());
     }
 }
