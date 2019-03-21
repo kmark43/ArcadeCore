@@ -29,8 +29,16 @@ public class MessageUtil {
         return "" + color + entity.getName();
     }
     
+    public static void send(CommandSender sender, String message) {
+        send(sender, "Game", message);
+    }
+    
     public static void send(CommandSender sender, String header, String message) {
         sender.sendMessage(formatMessage(header, message));
+    }
+    
+    public static void broadcast(String message) {
+        broadcast("Game", message);
     }
     
     public static void broadcast(String header, String message) {

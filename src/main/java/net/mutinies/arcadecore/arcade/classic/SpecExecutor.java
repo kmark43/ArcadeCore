@@ -2,6 +2,7 @@ package net.mutinies.arcadecore.arcade.classic;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.arcade.participation.ParticipationManager;
+import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -40,9 +41,9 @@ public class SpecExecutor implements CommandExecutor, TabCompleter {
         }
         
         if (participationManager.isParticipating(player)) {
-            sender.sendMessage("You will now participate in the game");
+            MessageUtil.send(sender, "You will participate in the next game");
         } else {
-            sender.sendMessage("You will no longer participate in the game");
+            MessageUtil.send(sender, "You will no longer participate in the next game");
         }
         
         return true;

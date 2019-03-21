@@ -312,7 +312,7 @@ public class ClassicGameManager implements GameManager {
                 window.set(9 * r + c, new WindowButton(stack, (ClickHandler) e -> {
                     if (getGame().getTeamManager().getQueuedTeam(player) != null) {
                         getGame().getTeamManager().removeQueuedTeam(player);
-                        MessageUtil.send(player, "Game", "You are no longer queued for a team");
+                        MessageUtil.send(player, "You are no longer queued for a team");
                     }
                     showTeamQueueingGui(player);
                     giveTeamQueuingItem(player);
@@ -345,7 +345,7 @@ public class ClassicGameManager implements GameManager {
                     int position = getGame().getTeamManager().queueTeam(player, team) + 1;
                     int size = getGame().getTeamManager().getQueued(team).size();
                     
-                    MessageUtil.send(player, "Game", "You are " + ChatColor.DARK_GRAY + position + ChatColor.GRAY + "/" + ChatColor.DARK_GRAY + size + MessageUtil.DEFAULT + " in queue for " + team.getColor().getChatColor() + team.getDisplayName());
+                    MessageUtil.send(player, "You are " + ChatColor.DARK_GRAY + position + ChatColor.GRAY + "/" + ChatColor.DARK_GRAY + size + MessageUtil.DEFAULT + " in queue for " + team.getColor().getChatColor() + team.getDisplayName());
                     showTeamQueueingGui(player);
                     giveTeamQueuingItem(player);
                 }));
