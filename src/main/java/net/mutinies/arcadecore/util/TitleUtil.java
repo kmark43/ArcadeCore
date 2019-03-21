@@ -11,6 +11,7 @@ public class TitleUtil {
         for (Player player : Bukkit.getOnlinePlayers()) {
             sendTitle(player, title, subtitle);
         }
+        broadcastTitle(title, subtitle, 5, 40, 5);
     }
     public static void broadcastTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         for (Player player : Bukkit.getOnlinePlayers()) {
