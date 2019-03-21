@@ -45,6 +45,10 @@ public class MessageUtil {
         Bukkit.broadcastMessage(formatMessage(header, message));
     }
     
+    public static void sendError(CommandSender sender, String message) {
+        sender.sendMessage(formatError("Game", message));
+    }
+    
     public static void sendError(CommandSender sender, String header, String message) {
         sender.sendMessage(formatError(header, message));
     }

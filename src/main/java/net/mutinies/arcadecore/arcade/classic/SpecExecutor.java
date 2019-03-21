@@ -17,7 +17,7 @@ public class SpecExecutor implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Must be a player");
+            MessageUtil.sendError(sender, "Must be a player");
             return true;
         }
     
@@ -32,11 +32,11 @@ public class SpecExecutor implements CommandExecutor, TabCompleter {
             } else if (args[0].equals("disable")) {
                 participationManager.setParticipating(player, true);
             } else {
-                sender.sendMessage("Invalid args");
+                MessageUtil.sendError(sender, "Invalid args");
                 return true;
             }
         } else {
-            sender.sendMessage("Invalid args");
+            MessageUtil.sendError(sender, "Invalid args");
             return true;
         }
         

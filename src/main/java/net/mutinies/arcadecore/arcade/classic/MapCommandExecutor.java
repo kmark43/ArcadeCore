@@ -3,6 +3,7 @@ package net.mutinies.arcadecore.arcade.classic;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.game.map.GameMap;
+import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,17 +17,17 @@ public class MapCommandExecutor implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         GameManager gameManager = ArcadeCorePlugin.getGameManager();
         if (args.length == 0) {
-            sender.sendMessage("Invalid args");
+            MessageUtil.sendError(sender,"Invalid args");
         } else {
             if (!gameManager.isGameRunning()) {
                 if (gameManager.getGame().getMapManager().getMap(args[0]) != null) {
                     gameManager.setMap(args[0]);
-                    sender.sendMessage("Set map to " + args[0]);
+                    MessageUtil.send(sender,"Set map to " + args[0]);
                 } else {
-                    sender.sendMessage("Map not found");
+                    MessageUtil.sendError(sender,"Map not found");
                 }
             } else {
-                sender.sendMessage("Invalid game state");
+                MessageUtil.sendError(sender,"Invalid game state");
             }
         }
         return true;

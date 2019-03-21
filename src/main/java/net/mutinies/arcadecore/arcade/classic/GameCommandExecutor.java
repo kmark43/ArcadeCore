@@ -6,6 +6,7 @@ import net.mutinies.arcadecore.api.StartResult;
 import net.mutinies.arcadecore.api.StopResult;
 import net.mutinies.arcadecore.arcade.ArcadeManager;
 import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,7 @@ public class GameCommandExecutor implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("Invalid arguments");
+            MessageUtil.sendError(sender,"Invalid arguments");
         } else {
             ArcadeManager arcadeManager = ArcadeCorePlugin.getArcadeManager();
             GameManager gameManager = ArcadeCorePlugin.getGameManager();
@@ -29,16 +30,16 @@ public class GameCommandExecutor implements CommandExecutor, TabCompleter {
                     StartResult startResult = gameManager.startGame();
                     switch (startResult) {
                         case STARTED:
-                            sender.sendMessage("Started the game");
+                            MessageUtil.send(sender,"Started the game");
                             break;
                         case INVALID_STATE:
-                            sender.sendMessage("Invalid state");
+                            MessageUtil.sendError(sender,"Invalid state");
                             break;
                         case NO_GAME_DEFINED:
-                            sender.sendMessage("No game defined");
+                            MessageUtil.sendError(sender,"No game defined");
                             break;
                         case NO_MAP_DEFINED:
-                            sender.sendMessage("No map defined");
+                            MessageUtil.sendError(sender,"No map defined");
                             break;
                     }
                     break;
@@ -46,27 +47,27 @@ public class GameCommandExecutor implements CommandExecutor, TabCompleter {
                     StopResult stopResult = gameManager.stopGame();
                     switch (stopResult) {
                         case STOPPED:
-                            sender.sendMessage("Stopped the game");
+                            MessageUtil.send(sender,"Stopped the game");
                             break;
                         case INVALID_STATE:
-                            sender.sendMessage("Invalid state");
+                            MessageUtil.sendError(sender,"Invalid state");
                             break;
                     }
                     break;
                 case "set":
                     if (args.length == 1) {
-                        sender.sendMessage("Please specify a game");
+                        MessageUtil.sendError(sender,"Please specify a game");
                     } else {
                         if (arcadeManager.hasGame(args[1])) {
                             gameManager.setGame(args[1]);
-                            sender.sendMessage("Set game to " + args[1]);
+                            MessageUtil.send(sender,"Set game to " + args[1]);
                         } else {
-                            sender.sendMessage("Game not found");
+                            MessageUtil.sendError(sender,"Game not found");
                         }
                     }
                     break;
                 default:
-                    sender.sendMessage("Invalid arguments");
+                    MessageUtil.sendError(sender,"Invalid arguments");
                     break;
             }
         }

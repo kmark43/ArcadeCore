@@ -3,6 +3,7 @@ package net.mutinies.arcadecore.arcade.classic;
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.config.ConfigProperty;
+import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,30 +19,30 @@ public class ConfigCommandExecutor implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             List<ConfigProperty> properties = game.getConfigManager().getProperties();
             for (ConfigProperty property : properties) {
-                sender.sendMessage(property.getName() + " - " + property.getValue());
+                MessageUtil.send(sender,property.getName() + MessageUtil.SEPARATOR + " - " + MessageUtil.VARIABLE + property.getValue());
             }
         } else if (args.length == 1) {
             if (game.getConfigManager().hasProperty(args[0])) {
                 ConfigProperty property = game.getConfigManager().getProperty(args[0]);
-                sender.sendMessage(property.getName() + " - " + property.getValue());
+                MessageUtil.send(sender,property.getName() + MessageUtil.SEPARATOR + " - " + MessageUtil.VARIABLE + property.getValue());
             } else if (args[0].equals("setdefaults")) {
                 for (ConfigProperty property : game.getConfigManager().getProperties()) {
                     property.setValue(property.getDefaultValue());
                 }
             } else {
-                sender.sendMessage("Invalid arguments");
+                MessageUtil.sendError(sender,"Invalid arguments");
             }
         } else if (args.length == 2) {
             if (game.getConfigManager().hasProperty(args[0])) {
                 ConfigProperty property = game.getConfigManager().getProperty(args[0]);
                 if (property.setValue(args[1])) {
-                    sender.sendMessage("Set " + property.getName() + " to " + property.getValue());
+                    MessageUtil.send(sender,"Set " + property.getName() + " to " + MessageUtil.VARIABLE + property.getValue());
                 } else {
-                    sender.sendMessage("Your input does not satisfy the property's constraints");
+                    MessageUtil.sendError(sender,"Your input does not satisfy the property's constraints");
                 }
             }
         } else {
-            sender.sendMessage("Invalid arguments");
+            MessageUtil.sendError(sender,"Invalid arguments");
         }
         return true;
     }
