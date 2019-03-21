@@ -37,7 +37,11 @@ commands:
 permissions:
   mutinies.arcadecore.*:
     children:
+      mutinies.arcadecore.game: true
+      mutinies.arcadecore.map: true
+      mutinies.arcadecore.config: true
       mutinies.arcadecore.pause: true
+      mutinies.arcadecore.spec: true
   mutinies.arcadecore.game:
     default: op
   mutinies.arcadecore.map:
