@@ -73,6 +73,7 @@ public class ClassicGameManager implements GameManager {
                     getGame().getKitManager().getKit(player).getDisplayName() : null;
             String map = getMap() != null ? getMap().getDisplayName() : "None";
             String game = getGame() != null ? getGame().getDisplayName() : "None";
+            String serverName = Bukkit.getServerName();
         
             List<String> lines = new ArrayList<>();
             
@@ -93,6 +94,10 @@ public class ClassicGameManager implements GameManager {
             lines.add("");
             lines.add(ChatColor.BOLD + "Game");
             lines.add(game);
+            
+            lines.add("");
+            lines.add(ChatColor.BOLD + "Server");
+            lines.add(serverName);
             return lines;
         });
     
