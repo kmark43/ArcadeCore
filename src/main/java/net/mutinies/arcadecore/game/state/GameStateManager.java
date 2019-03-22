@@ -198,8 +198,9 @@ public class GameStateManager implements Module {
     }
     
     private void assignTeams() {
-        List<GameTeam> teams = game.getMapManager().getCurrentMap().getParsedTeams().stream()
-                .map(teamName -> game.getTeamManager().getTeam(teamName)).collect(Collectors.toList());
+        List<GameTeam> teams = game.getTeamManager().getTeams().stream()
+                .filter(team -> game.getMapManager().getCurrentMap().getSpawnpoints(team) != null)
+                .collect(Collectors.toList());
         game.getTeamManager().assignTeams(teams);
     }
     
