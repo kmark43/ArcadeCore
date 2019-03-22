@@ -31,6 +31,9 @@ public class TeamCommandExecutor implements CommandExecutor, TabCompleter {
     
         if (!gameManager.isGameRunning()) {
             // todo fill in
+        } else {
+            game.getTeamManager().setTeam(player, game.getTeamManager().getTeam(args[0]));
+            game.getKitManager().getKit(player).giveItems(player);
         }
         return true;
     }

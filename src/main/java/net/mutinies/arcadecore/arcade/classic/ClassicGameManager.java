@@ -155,6 +155,9 @@ public class ClassicGameManager implements GameManager {
     
         ArcadeCorePlugin.getInstance().getCommand("pause").setExecutor(new PauseExecutor(this));
         
+        ArcadeCorePlugin.getInstance().getCommand("team").setExecutor(new TeamCommandExecutor());
+        ArcadeCorePlugin.getInstance().getCommand("team").setTabCompleter(new TeamCommandExecutor());
+        
         Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::startLobbyState);
     }
     

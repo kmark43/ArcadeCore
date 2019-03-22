@@ -31,8 +31,11 @@ commands:
     description: Change the current game's configuration
     permission: mutinies.arcadecore.config
   pause:
-    description: Change the current game's configuration
+    description: Toggles the countdown's unpaused state
     permission: mutinies.arcadecore.pause
+  team:
+    description: Change the team of a player
+    permission: mutinies.arcadecore.team
 
 permissions:
   mutinies.arcadecore.*:
@@ -42,6 +45,7 @@ permissions:
       mutinies.arcadecore.config: true
       mutinies.arcadecore.pause: true
       mutinies.arcadecore.spec: true
+      mutinies.arcadecore.team: true
   mutinies.arcadecore.game:
     default: op
   mutinies.arcadecore.map:
@@ -49,6 +53,8 @@ permissions:
   mutinies.arcadecore.config:
     default: op
   mutinies.arcadecore.pause:
+    default: op
+  mutinies.arcadecore.team:
     default: op
   mutinies.arcadecore.spec:
     default: true

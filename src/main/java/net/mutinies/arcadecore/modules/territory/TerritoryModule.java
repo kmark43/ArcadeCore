@@ -11,13 +11,16 @@ import net.mutinies.arcadecore.event.GameStateSetEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
+import net.mutinies.arcadecore.game.kit.Kit;
 import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.state.GameStateManager;
 import net.mutinies.arcadecore.game.team.GameTeam;
+import net.mutinies.arcadecore.games.paintball.PotionRespawnEvent;
 import net.mutinies.arcadecore.games.paintball.event.territory.TerritoryRespawnEvent;
 import net.mutinies.arcadecore.modules.gamescore.TeamWinHandler;
 import net.mutinies.arcadecore.util.JsonUtil;
 import net.mutinies.arcadecore.util.MessageUtil;
+import net.mutinies.arcadecore.util.PlayerUtil;
 import net.mutinies.arcadecore.util.TitleUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,6 +30,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -40,6 +44,9 @@ public class TerritoryModule extends TeamWinHandler {
     private BukkitTask scoreTask;
     
     private Map<UUID, BukkitTask> respawnTasks;
+    private Map<UUID, Kit> deathKits;
+    private Map<UUID, ItemStack[]> deathInventory;
+    private Map<UUID, ItemStack[]> deathArmor;
     
     private boolean hundredShown;
     private boolean tenShown;
@@ -58,6 +65,9 @@ public class TerritoryModule extends TeamWinHandler {
         scoreMap = new HashMap<>();
         territories = new ArrayList<>();
         respawnTasks = new HashMap<>();
+        deathKits = new HashMap<>();
+        deathInventory = new HashMap<>();
+        deathArmor = new HashMap<>();
         hundredShown = false;
         tenShown = false;
     
@@ -78,6 +88,9 @@ public class TerritoryModule extends TeamWinHandler {
         respawnTasks = null;
         territories = null;
         winner = null;
+        deathKits = null;
+        deathInventory = null;
+        deathArmor = null;
     }
     
     @EventHandler
@@ -156,20 +169,6 @@ public class TerritoryModule extends TeamWinHandler {
     }
     
     @EventHandler
-    public void onPlayerDeath(GameDeathEvent e) {
-        Player player = e.getKilled();
-        GameTeam team = game.getTeamManager().getTeam(player);
-    
-        BukkitTask task = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> {
-            respawnTasks.remove(player.getUniqueId());
-            respawnPlayer(player);
-        }, (Integer) game.getConfigManager().getProperty("respawn_time").getValue());
-    
-        respawnTasks.put(player.getUniqueId(), task);
-        checkShouldEnd(game);
-    }
-    
-    @EventHandler
     public void onTerritoryClaim(TerritoryClaimEvent e) {
         GameTeam team = e.getTeam();
         Set<UUID> uuids = team.getPlayers();
@@ -229,6 +228,27 @@ public class TerritoryModule extends TeamWinHandler {
         checkShouldEnd(game);
     }
     
+    @EventHandler
+    public void onPlayerDeath(GameDeathEvent e) {
+        Player player = e.getKilled();
+        GameTeam team = game.getTeamManager().getTeam(player);
+        
+        BukkitTask task = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> {
+            respawnTasks.remove(player.getUniqueId());
+            respawnPlayer(player);
+        }, (Integer) game.getConfigManager().getProperty("respawn_time").getValue());
+        
+        respawnTasks.put(player.getUniqueId(), task);
+        deathKits.put(player.getUniqueId(), game.getKitManager().getKit(player));
+        deathInventory.put(player.getUniqueId(), player.getInventory().getContents());
+        deathArmor.put(player.getUniqueId(), player.getInventory().getArmorContents());
+    
+        PlayerUtil.clearInventory(player);
+        game.getKitManager().giveKitSelectionItem(player);
+        
+        checkShouldEnd(game);
+    }
+    
     private void respawnPlayer(Player player) {
         GameTeam team = game.getTeamManager().getTeam(player);
         List<Territory> claimedTerritories = getClaimedTerritories(team);
@@ -245,16 +265,32 @@ public class TerritoryModule extends TeamWinHandler {
     
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        cancelRespawn(e.getPlayer());
+        cancelRespawnTask(e.getPlayer());
         checkShouldEnd(game);
     }
     
     @EventHandler
     public void onPlayerRespawn(GameRespawnEvent e) {
-        cancelRespawn(e.getPlayer());
+        cancelRespawnTask(e.getPlayer());
+        deathKits.remove(e.getPlayer().getUniqueId());
+        deathInventory.remove(e.getPlayer().getUniqueId());
+        deathArmor.remove(e.getPlayer().getUniqueId());
     }
     
-    private void cancelRespawn(Player player) {
+    @EventHandler
+    public void onPotionRespawn(PotionRespawnEvent e) {
+        Kit kit = deathKits.get(e.getPlayer().getUniqueId());
+        game.getKitManager().setKit(e.getPlayer(), kit);
+        
+        ItemStack[] invContents = deathInventory.get(e.getPlayer().getUniqueId());
+        
+        kit.giveItems(e.getPlayer());
+        Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> {
+            e.getPlayer().getInventory().setContents(invContents);
+        });
+    }
+    
+    private void cancelRespawnTask(Player player) {
         BukkitTask task = respawnTasks.remove(player.getUniqueId());
         if (task != null) {
             task.cancel();

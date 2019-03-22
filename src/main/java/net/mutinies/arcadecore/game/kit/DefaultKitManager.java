@@ -122,10 +122,12 @@ public class DefaultKitManager implements KitManager {
                 break;
             case RUNNING:
             case ENDING:
-                player.getInventory().setContents(new ItemStack[36]);
-                player.getInventory().setArmorContents(new ItemStack[4]);
-                kit.giveItems(player);
-                kit.giveEffects(player);
+                if (game.getDamageManager().isAlive(player)) {
+                    player.getInventory().setContents(new ItemStack[36]);
+                    player.getInventory().setArmorContents(new ItemStack[4]);
+                    kit.giveItems(player);
+                    kit.giveEffects(player);
+                }
                 break;
         }
         
