@@ -10,9 +10,9 @@ import org.bukkit.event.EventHandler;
 public class RevivesStatsTracker implements Module {
     private Game game;
     
-    public RevivesStatsTracker(Game game) {
+    public RevivesStatsTracker(Game game, boolean show) {
         this.game = game;
-        game.getStatsManager().registerProperty(new StatsProperty("revives", "Revives", true, 0));
+        game.getStatsManager().registerProperty(new StatsProperty("revives", "Revives", show, 0));
     }
     
     @EventHandler

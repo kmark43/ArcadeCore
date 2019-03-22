@@ -16,7 +16,7 @@ public class MessageUtil {
     public static String VARIABLE = "" + ChatColor.LIGHT_PURPLE;
     public static String SEPARATOR = "" + ChatColor.DARK_GRAY;
     public static String NUMBER = "" + ChatColor.DARK_GRAY;
-    public static String LINE_SEPARATOR = DEFAULT + "-----------------------------------------------------";
+    public static String LINE_SEPARATOR = "-----------------------------------------------------";
     
     public static String getColoredName(Entity entity) {
         ChatColor color = ChatColor.YELLOW;
@@ -27,7 +27,7 @@ public class MessageUtil {
             color = team.getColor().getChatColor();
         }
         
-        return "" + color + entity.getName();
+        return "" + color + entity.getName() + DEFAULT;
     }
     
     public static void send(CommandSender sender, String message) {

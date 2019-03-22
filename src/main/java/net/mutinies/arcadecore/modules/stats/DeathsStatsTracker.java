@@ -11,9 +11,9 @@ import org.bukkit.event.EventHandler;
 public class DeathsStatsTracker implements Module {
     private Game game;
     
-    public DeathsStatsTracker(Game game) {
+    public DeathsStatsTracker(Game game, boolean show) {
         this.game = game;
-        game.getStatsManager().registerProperty(new StatsProperty("deaths", "Deaths", true, 0));
+        game.getStatsManager().registerProperty(new StatsProperty("deaths", "Deaths", show, 0));
     }
     
     @EventHandler

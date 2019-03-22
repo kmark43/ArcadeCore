@@ -6,9 +6,12 @@ import net.mutinies.arcadecore.game.projectile.ListeningProjectile;
 import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
+
+import java.util.Set;
 
 import static net.mutinies.arcadecore.util.MessageUtil.getColoredName;
 
@@ -20,12 +23,18 @@ public class PaintDeathMessageModule implements Module  {
             ListeningProjectile projectile = ArcadeCorePlugin.getGame().getProjectileManager().getListeningProjectile(p);
             if (projectile == null) return;
             
+            Set<Player> contributors = e.getContributingPlayers();
+            if (e.getLastDamagerOrPlayer() instanceof Player) {
+                contributors.remove((Player)e.getLastDamagerOrPlayer());
+            }
+            String contributorTag = contributors.isEmpty() ? "" : " (+" + contributors.size() + ")";
+            
             String playerAddon = "";
             String gunAddon = "";
             String distanceSuffix = "";
             
             if (e.getLastDamagerOrPlayer() != null) {
-                playerAddon = " by " + getColoredName(e.getLastDamagerOrPlayer()) + MessageUtil.DEFAULT;
+                playerAddon = " by " + getColoredName(e.getLastDamagerOrPlayer()) + contributorTag;
             }
             
             if (projectile.getShootingItem() != null) {
@@ -40,7 +49,7 @@ public class PaintDeathMessageModule implements Module  {
                 distanceSuffix = " (" + roundedDist + " " + blockOrBlocks + ")";
             }
     
-            e.setDeathMessage(getColoredName(e.getKilled()) + MessageUtil.DEFAULT + " was painted" + playerAddon + gunAddon + distanceSuffix + ".");
+            e.setDeathMessage(getColoredName(e.getKilled()) + " was painted" + playerAddon + gunAddon + distanceSuffix + ".");
         }
     }
 }

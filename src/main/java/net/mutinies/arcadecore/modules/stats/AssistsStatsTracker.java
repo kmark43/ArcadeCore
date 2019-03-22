@@ -8,21 +8,23 @@ import net.mutinies.arcadecore.module.Module;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
-public class KillStatsTracker implements Module {
+public class AssistsStatsTracker implements Module {
     private Game game;
     
-    public KillStatsTracker(Game game, boolean show) {
+    public AssistsStatsTracker(Game game, boolean show) {
         this.game = game;
-        game.getStatsManager().registerProperty(new StatsProperty("kills", "Kills", show, 0));
+        game.getStatsManager().registerProperty(new StatsProperty("assists", "Assists", show, 0));
     }
     
     @EventHandler
     public void onGameDeath(GameDeathEvent e) {
-        if (!(e.getKiller() instanceof Player)) return;
-    
         StatsManager statsManager = game.getStatsManager();
-        Player player = (Player)e.getKiller();
-        int kills = (int)statsManager.getValue(player, "kills", 0);
-        statsManager.setValue(player, "kills", kills + 1);
+        for (Player player : e.getContributingPlayers()) {
+            if (e.getKiller() != null && player.getUniqueId().equals(e.getKiller().getUniqueId())) {
+                continue;
+            }
+            int assists = (int)statsManager.getValue(player, "assists", 0);
+            statsManager.setValue(player, "assists", assists + 1);
+        }
     }
 }
