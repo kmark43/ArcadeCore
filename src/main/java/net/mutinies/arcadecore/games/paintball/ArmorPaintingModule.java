@@ -21,7 +21,7 @@ public class ArmorPaintingModule implements Module {
     public void updateArmor(Player player) {
         GameTeam playerTeam = game.getTeamManager().getTeam(player);
         int expectedNumPainted = getExpectedArmorPiecesPainted(player);
-        setPaintedArmor(player, expectedNumPainted, playerTeam.getColor().getColor(), Color.PURPLE);
+        setPaintedArmor(player, expectedNumPainted, playerTeam.getColor().getColor(), Color.BLACK);
     }
     
     @EventHandler(priority = EventPriority.HIGH)

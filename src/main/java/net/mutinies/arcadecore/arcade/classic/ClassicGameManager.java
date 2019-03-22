@@ -79,24 +79,24 @@ public class ClassicGameManager implements GameManager {
             String serverName = Bukkit.getServerName();
         
             List<String> lines = new ArrayList<>();
-            
+    
             lines.add("");
-            lines.add(ChatColor.BOLD + "Players");
-            lines.add(participationManager.getParticipants().size() + "/" + getGame().getMaxPlayers());
-            
+            lines.add(ChatColor.BOLD + "Game");
+            lines.add(game);
+    
+            lines.add("");
+            lines.add(ChatColor.BOLD + "Map");
+            lines.add(map);
+    
             if (kit != null) {
                 lines.add("");
                 lines.add(ChatColor.BOLD + "Kit");
                 lines.add(kit);
             }
-            
+    
             lines.add("");
-            lines.add(ChatColor.BOLD + "Map");
-            lines.add(map);
-            
-            lines.add("");
-            lines.add(ChatColor.BOLD + "Game");
-            lines.add(game);
+            lines.add(ChatColor.BOLD + "Players");
+            lines.add(participationManager.getParticipants().size() + "/" + getGame().getMaxPlayers());
             
             lines.add("");
             lines.add(ChatColor.BOLD + "Server");

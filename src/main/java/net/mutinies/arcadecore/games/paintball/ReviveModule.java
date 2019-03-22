@@ -78,7 +78,7 @@ public class ReviveModule implements Module {
         ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
         Stream.of(chestplate, leggings, boots).forEach(itemStack -> {
             LeatherArmorMeta itemMeta = ((LeatherArmorMeta) itemStack.getItemMeta());
-            itemMeta.setColor(Color.PURPLE);
+            itemMeta.setColor(Color.BLACK);
             itemStack.setItemMeta(itemMeta);
         });
     

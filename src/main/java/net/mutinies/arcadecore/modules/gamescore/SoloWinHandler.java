@@ -3,7 +3,6 @@ package net.mutinies.arcadecore.modules.gamescore;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.util.MessageUtil;
 import net.mutinies.arcadecore.util.TitleUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -25,7 +24,6 @@ public abstract class SoloWinHandler implements EndHandler {
             winnerName = ChatColor.YELLOW + "Nobody";
         }
         MessageUtil.broadcast("Game", winnerName + MessageUtil.DEFAULT + " has won the game.");
-        Bukkit.broadcastMessage("");
         TitleUtil.broadcastTitle(winnerName, "won the game");
     }
 

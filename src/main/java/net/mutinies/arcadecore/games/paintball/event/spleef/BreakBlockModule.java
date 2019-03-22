@@ -26,20 +26,22 @@ public class BreakBlockModule implements ProjectileHitBlockHandler {
         Block block = projectileHitBlockEvent.getHitBlock();
         BlockState state = block.getState();
         MaterialData data = state.getData();
-        switch (data.getItemType()) {
-            case CLAY:
-            case HARD_CLAY:
-            case GLASS:
-            case THIN_GLASS:
-            case WOOL:
-            case STAINED_CLAY:
-            case STAINED_GLASS:
-            case STAINED_GLASS_PANE:
-            case CARPET:
-                for (Block b : getInRadius(projectileHitBlockEvent.getHitBlock().getLocation(), radius)) {
-                    b.setType(Material.AIR, false);
-                }
-                break;
+    
+        for (Block b : getInRadius(projectileHitBlockEvent.getHitBlock().getLocation(), radius)) {
+            MaterialData d = b.getState().getData();
+            switch (d.getItemType()) {
+                case CLAY:
+                case HARD_CLAY:
+                case GLASS:
+                case THIN_GLASS:
+                case WOOL:
+                case STAINED_CLAY:
+                case STAINED_GLASS:
+                case STAINED_GLASS_PANE:
+                case CARPET:
+                        b.setType(Material.AIR, false);
+                    break;
+            }
         }
     }
     

@@ -24,7 +24,6 @@ public abstract class TeamWinHandler implements EndHandler {
             winnerName = ChatColor.YELLOW + "Nobody";
         }
         MessageUtil.broadcast("Game", winnerName + MessageUtil.DEFAULT + " has won the game.");
-        Bukkit.broadcastMessage("");
         TitleUtil.broadcastTitle(winnerName, "won the game");
     }
 

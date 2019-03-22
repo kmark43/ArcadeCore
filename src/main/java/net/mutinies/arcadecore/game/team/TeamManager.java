@@ -131,9 +131,9 @@ public class TeamManager implements Module {
         for (Player player : players) {
             if (getTeam(player) != null) continue;
             GameTeam smallestTeam = null;
-            int smallestNumPlayers = 0;
+            int smallestNumPlayers = Integer.MAX_VALUE;
             for (GameTeam team : assignableTeams) {
-                if (team.getPlayers().size() <= smallestNumPlayers) {
+                if (team.getPlayers().size() < smallestNumPlayers) {
                     smallestNumPlayers = team.getPlayers().size();
                     smallestTeam = team;
                 }

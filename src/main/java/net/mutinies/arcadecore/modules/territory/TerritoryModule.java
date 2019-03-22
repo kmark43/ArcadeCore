@@ -186,7 +186,7 @@ public class TerritoryModule extends TeamWinHandler {
             TitleUtil.sendTitle(player, "", ChatColor.GREEN + "Territory Captured", 2, 10, 2);
         }
     
-        for (Player other : Bukkit.getOnlinePlayers()) {
+        for (Player other : players) {
             other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, 1f);
             Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, 1f), 5);
         }
@@ -208,17 +208,20 @@ public class TerritoryModule extends TeamWinHandler {
         }
         
         if (territories.isEmpty()) {
-            for (Player other : Bukkit.getOnlinePlayers()) {
-                other.playSound(other.getLocation(), Sound.SILVERFISH_KILL, 1f, 1f);
-            }
-            
-            TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
-                    "is in the " + ChatColor.DARK_RED + "Danger Zone", 2, 20, 2);
     
-            MessageUtil.broadcast("Game", "" + team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
-                    "is in the " + ChatColor.DARK_RED + "Danger Zone");
+            Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> {
+                if (winner != null) return;
+                for (Player other : Bukkit.getOnlinePlayers()) {
+                    other.playSound(other.getLocation(), Sound.SILVERFISH_KILL, 1f, 1f);
+                }
+                TitleUtil.broadcastTitle(team.getColor().getChatColor() + team.getDisplayName() + " Team",
+                        "is in the " + ChatColor.DARK_RED + "Danger Zone", 2, 20, 2);
+    
+                MessageUtil.broadcast("Game", "" + team.getColor().getChatColor() + team.getDisplayName() + " Team " + MessageUtil.DEFAULT +
+                        "is in the " + ChatColor.DARK_RED + "Danger Zone");
+            });
         } else {
-            for (Player other : Bukkit.getOnlinePlayers()) {
+            for (Player other : players) {
                 other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, .3f);
                 Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> other.playSound(other.getLocation(), Sound.NOTE_PLING, 1f, .3f), 5);
             }
