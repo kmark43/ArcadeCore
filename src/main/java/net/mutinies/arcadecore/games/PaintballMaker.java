@@ -13,6 +13,8 @@ import net.mutinies.arcadecore.modules.gamescore.TeamEliminationModule;
 import net.mutinies.arcadecore.modules.prevent.NoFriendlyFireModule;
 import net.mutinies.arcadecore.modules.prevent.NoPearlTeleportModule;
 import net.mutinies.arcadecore.modules.prevent.NoRegenModule;
+import net.mutinies.arcadecore.modules.stats.DeathsStatsTracker;
+import net.mutinies.arcadecore.modules.stats.KillStatsTracker;
 import net.mutinies.arcadecore.util.ItemBuilder;
 import net.mutinies.arcadecore.util.ModuleUtil;
 import org.bukkit.ChatColor;
@@ -64,6 +66,9 @@ public class PaintballMaker {
         addModule("revive", reviveModule);
         addModule("armor_painting", armorPaintingModule);
         addModule("combo", comboModule);
+        addModule("kill_tracker", new KillStatsTracker(paintball));
+        addModule("death_tracker", new DeathsStatsTracker(paintball));
+        addModule("revive_tracker", new RevivesStatsTracker(paintball));
     
         // Rifle
         ItemStack rifleStack = ItemManager.tag(ItemBuilder.of(Material.IRON_BARDING).name("" + ChatColor.WHITE + "Rifle").build(), "gun_rifle");

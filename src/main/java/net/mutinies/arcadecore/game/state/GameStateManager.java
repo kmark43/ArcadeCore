@@ -7,6 +7,7 @@ import net.mutinies.arcadecore.game.kit.Kit;
 import net.mutinies.arcadecore.game.kit.KitManager;
 import net.mutinies.arcadecore.game.map.GameMap;
 import net.mutinies.arcadecore.game.map.MapManager;
+import net.mutinies.arcadecore.game.stats.StatsProperty;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.game.team.TeamManager;
 import net.mutinies.arcadecore.module.Module;
@@ -54,7 +55,15 @@ public class GameStateManager implements Module {
         this.game = game;
         state = GameState.NOT_ACTIVE;
         
-        generalModules = Arrays.asList(this, game.getSpectateManager(), game.getDamageManager(), game.getTeamManager(), game.getKitManager(), game.getProjectileManager(), game.getScoreboardManager());
+        generalModules = Arrays.asList(this,
+                game.getStatsManager(),
+                game.getSpectateManager(),
+                game.getDamageManager(),
+                game.getTeamManager(),
+                game.getKitManager(),
+                game.getProjectileManager(),
+                game.getScoreboardManager());
+        
         startModules = Arrays.asList(new NoInteractModule(), new NoDamageModule(), new NoHungerChangeModule());
         runningModules = Arrays.asList();
         endingModules = Arrays.asList();
@@ -118,6 +127,9 @@ public class GameStateManager implements Module {
                 enableModules(Arrays.asList(game.getEndHandler()));
                 enableModules(generalModules);
                 enableModules(startModules);
+                for (Player participant : ArcadeCorePlugin.getParticipants()) {
+                    game.getStatsManager().initPlayer(participant);
+                }
                 List<Player> nonParticipants = new ArrayList<>(Bukkit.getOnlinePlayers());
                 nonParticipants.removeAll(ArcadeCorePlugin.getParticipants());
                 for (Player nonParticipant : nonParticipants) {
@@ -142,6 +154,7 @@ public class GameStateManager implements Module {
                 int endDelay = ArcadeCorePlugin.getInstance().getConfig().getInt("endDelay");
                 enableModules(endingModules);
                 game.getEndHandler().onWin(game);
+                Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::showStats);
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.NOT_ACTIVE), 20 * endDelay);
                 break;
         }
@@ -209,6 +222,21 @@ public class GameStateManager implements Module {
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
             player.setFlying(true);
+        }
+    }
+    
+    private void showStats() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!game.getStatsManager().hasStats(player)) {
+                continue;
+            }
+            player.sendMessage(MessageUtil.DEFAULT + MessageUtil.LINE_SEPARATOR);
+            MessageUtil.send(player, "Game Stats:");
+            for (StatsProperty property : game.getStatsManager().getProperties()) {
+                Object value = game.getStatsManager().getValue(player, property.getName(), property.getInitialValue());
+                MessageUtil.send(player, property.getDisplayName() + MessageUtil.SEPARATOR + " - " + MessageUtil.VARIABLE + value);
+            }
+            player.sendMessage(MessageUtil.DEFAULT + MessageUtil.LINE_SEPARATOR);
         }
     }
     

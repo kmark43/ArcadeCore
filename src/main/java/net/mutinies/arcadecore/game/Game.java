@@ -11,6 +11,7 @@ import net.mutinies.arcadecore.game.projectile.ProjectileManager;
 import net.mutinies.arcadecore.game.scoreboard.ScoreboardManager;
 import net.mutinies.arcadecore.game.spec.SpectateManager;
 import net.mutinies.arcadecore.game.state.GameStateManager;
+import net.mutinies.arcadecore.game.stats.StatsManager;
 import net.mutinies.arcadecore.game.team.TeamManager;
 import net.mutinies.arcadecore.modules.gamescore.EndHandler;
 
@@ -28,6 +29,7 @@ public class Game {
     private TeamManager teamManager;
     private MapManager mapManager;
     private DamageManager damageManager;
+    private StatsManager statsManager;
     private SpectateManager spectateManager;
     private ModuleManager moduleManager;
     private GameStateManager gameStateManager;
@@ -52,6 +54,7 @@ public class Game {
         teamManager = new TeamManager(this);
         mapManager = new MapManager(this);
         damageManager = new DefaultDamageManager(this);
+        statsManager = new StatsManager();
         moduleManager = new ModuleManager(this);
         spectateManager = new SpectateManager(this);
         projectileManager = new ProjectileManager(this);
@@ -102,6 +105,10 @@ public class Game {
     
     public SpectateManager getSpectateManager() {
         return spectateManager;
+    }
+    
+    public StatsManager getStatsManager() {
+        return statsManager;
     }
     
     public ModuleManager getModuleManager() {

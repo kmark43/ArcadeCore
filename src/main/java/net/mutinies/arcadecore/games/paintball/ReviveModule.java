@@ -162,7 +162,7 @@ public class ReviveModule implements Module {
                 target = armorStandMap.get(entity);
                 if (game.getTeamManager().getTeam(player).equals(game.getTeamManager().getTeam(target))) {
                     entity.remove();
-                    Bukkit.getPluginManager().callEvent(new PotionRespawnEvent(target));
+                    Bukkit.getPluginManager().callEvent(new PotionRespawnEvent(target, player));
                     game.getDamageManager().respawn(target);
                     target.setVelocity(new Vector(0, 0, 0));
                     target.teleport(entity);
