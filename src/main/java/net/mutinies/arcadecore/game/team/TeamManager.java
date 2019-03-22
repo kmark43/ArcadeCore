@@ -106,6 +106,7 @@ public class TeamManager implements Module {
     
     public void assignTeams(List<GameTeam> assignableTeams) {
         List<Player> players = new ArrayList<>(ArcadeCorePlugin.getParticipants());
+        Collections.shuffle(assignableTeams);
         Collections.shuffle(players);
         
         int maxTeamSize = (int)Math.ceil((double)players.size() / assignableTeams.size());
