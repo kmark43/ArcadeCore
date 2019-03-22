@@ -65,7 +65,7 @@ public class GameMaker {
         Game paintball = new Game("territory_paintball", "Territory Paintball", "TPB", 2, 40);
         
         PaintballMaker paintballMaker = new PaintballMaker(paintball);
-        TerritoryModule territoryModule = new TerritoryModule(paintball, 500, 20 * 5);
+        TerritoryModule territoryModule = new TerritoryModule(paintball, 1000, 20 * 5);
         paintball.setEndHandler(territoryModule);
         paintballMaker.addModule("territory_claim", new PaintingTerritoryClaimModule(paintball, territoryModule));
         paintballMaker.addModule("prevent_territory_paint", new PreventTerritoryPaintModule(territoryModule));
