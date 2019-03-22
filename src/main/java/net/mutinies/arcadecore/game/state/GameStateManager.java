@@ -16,11 +16,9 @@ import net.mutinies.arcadecore.modules.prevent.NoHungerChangeModule;
 import net.mutinies.arcadecore.modules.prevent.NoInteractModule;
 import net.mutinies.arcadecore.util.MessageUtil;
 import net.mutinies.arcadecore.util.PlayerUtil;
+import net.mutinies.arcadecore.util.SoundUtil;
 import net.mutinies.arcadecore.util.TitleUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -140,6 +138,7 @@ public class GameStateManager implements Module {
                 teleportPlayersToGame();
                 game.getKitManager().giveKitSelectionItems();
                 displayGameStartMessage();
+                SoundUtil.broadcastSound(Sound.LEVEL_UP, 2f, 1f);
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.RUNNING), 20 * freezeDelay);
                 break;
             case RUNNING:
@@ -149,12 +148,14 @@ public class GameStateManager implements Module {
                 enableModules(runningModules);
                 enableModules(game.getModuleManager().getGameModules());
                 enableModules(getKitModules());
+                SoundUtil.broadcastSound(Sound.NOTE_PLING, 1f, .3f);
                 break;
             case ENDING:
                 int endDelay = ArcadeCorePlugin.getInstance().getConfig().getInt("endDelay");
                 enableModules(endingModules);
                 game.getEndHandler().onWin(game);
                 Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), this::showStats);
+                SoundUtil.broadcastSound(Sound.LEVEL_UP, 2f, 1f);
                 changeStateTask = Bukkit.getScheduler().runTaskLater(ArcadeCorePlugin.getInstance(), () -> setState(GameState.NOT_ACTIVE), 20 * endDelay);
                 break;
         }

@@ -22,14 +22,8 @@ import net.mutinies.arcadecore.item.ClickEvent;
 import net.mutinies.arcadecore.item.ItemManager;
 import net.mutinies.arcadecore.module.Module;
 import net.mutinies.arcadecore.modules.prevent.*;
-import net.mutinies.arcadecore.util.ItemBuilder;
-import net.mutinies.arcadecore.util.MessageUtil;
-import net.mutinies.arcadecore.util.ModuleUtil;
-import net.mutinies.arcadecore.util.PlayerUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Material;
+import net.mutinies.arcadecore.util.*;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -277,6 +271,9 @@ public class ClassicGameManager implements GameManager {
     private void updateCountdown() {
         timeLeft--;
         scoreboardManager.setTitle(ChatColor.BOLD + "Starting in " + timeLeft + " seconds");
+        if (timeLeft <= 10) {
+            SoundUtil.broadcastSound(Sound.NOTE_PLING, 1f, 1f);
+        }
         if (timeLeft <= 0) {
             stopCountdown();
             startGame();
