@@ -18,10 +18,10 @@ public class GivePotionOnKillModule implements Module {
         if (e.getKiller() instanceof Player) {
             Player player = (Player)e.getKiller();
             int numPotions = reviveModule.getNumPotions(player, 1);
-            if (numPotions < 3) {
+//            if (numPotions < 3) {
 //                player.getInventory().addItem(reviveModule.getReviveStack(player, 1));
                 reviveModule.setNumPotions(player, 1, numPotions + 1);
-            }
+//            }
         }
     }
 }

@@ -27,7 +27,12 @@ public class PaintDeathMessageModule implements Module  {
             if (e.getLastDamagerOrPlayer() instanceof Player) {
                 contributors.remove((Player)e.getLastDamagerOrPlayer());
             }
-            String contributorTag = contributors.isEmpty() ? "" : " (+" + contributors.size() + ")";
+//            String contributorTag = contributors.isEmpty() ? "" : " (+" + contributors.size() + ")";
+            StringBuilder contributorTag = new StringBuilder();
+
+            for (Player contributor : contributors) {
+                contributorTag.append(" + ").append(getColoredName(contributor));
+            }
             
             String playerAddon = "";
             String gunAddon = "";

@@ -165,7 +165,13 @@ public class ReviveModule implements Module {
                     Bukkit.getPluginManager().callEvent(new PotionRespawnEvent(target, player));
                     game.getDamageManager().respawn(target);
                     target.setVelocity(new Vector(0, 0, 0));
-                    target.teleport(entity);
+                    Location targetLocation = new Location(entity.getWorld(),
+                            entity.getLocation().getX(),
+                            entity.getLocation().getY(),
+                            entity.getLocation().getZ(),
+                            target.getLocation().getYaw(),
+                            target.getLocation().getPitch());
+                    target.teleport(targetLocation);
                     armorStandMap.remove(entity);
                     Bukkit.getPluginManager().callEvent(new GameReviveEvent(target));
                 }
