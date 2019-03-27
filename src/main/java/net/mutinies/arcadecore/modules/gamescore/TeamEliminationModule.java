@@ -17,6 +17,7 @@ import java.util.List;
 
 public class TeamEliminationModule extends TeamWinHandler implements Module {
     private Game game;
+    private GameTeam winner;
 
     public TeamEliminationModule(Game game, boolean displayScoreboard) {
         this.game = game;
@@ -53,12 +54,15 @@ public class TeamEliminationModule extends TeamWinHandler implements Module {
         int numWithPlayers = game.getTeamManager().getLivingTeams().size();
 
         if (numWithPlayers <= 1) {
+            winner = numWithPlayers == 0 ? winner : game.getTeamManager().getLivingTeams().get(0);
             GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.TOO_FEW_ALIVE);
             Bukkit.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 game.getGameStateManager().stop();
             }
+            return;
         }
+        winner = null;
     }
     
     @EventHandler
@@ -76,7 +80,8 @@ public class TeamEliminationModule extends TeamWinHandler implements Module {
 
     @Override
     public GameTeam getWinningTeam(Game game) {
-        List<GameTeam> livingTeams = game.getTeamManager().getLivingTeams();
-        return livingTeams.size() == 1 ? livingTeams.get(0) : null;
+//        List<GameTeam> livingTeams = game.getTeamManager().getLivingTeams();
+//        return livingTeams.size() == 1 ? livingTeams.get(0) : null;
+        return winner;
     }
 }

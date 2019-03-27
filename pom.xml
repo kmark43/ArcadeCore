@@ -63,10 +63,9 @@
     </repositories>
 
     <dependencies>
-        <!--Spigot API-->
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <artifactId>spigot</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
@@ -96,11 +95,6 @@
             <groupId>org.inventivetalent</groupId>
             <artifactId>particleapi</artifactId>
             <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.inventivetalent</groupId>
-            <artifactId>bossbarapi</artifactId>
-            <version>2.4.1</version>
         </dependency>
     </dependencies>
 </project>

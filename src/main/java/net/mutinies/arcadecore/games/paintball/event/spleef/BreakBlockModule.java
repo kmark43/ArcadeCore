@@ -4,6 +4,7 @@ import net.mutinies.arcadecore.event.ProjectileHitBlockEvent;
 import net.mutinies.arcadecore.game.Game;
 import net.mutinies.arcadecore.game.projectile.ListeningProjectile;
 import net.mutinies.arcadecore.game.projectile.ProjectileHitBlockHandler;
+import net.mutinies.arcadecore.util.BuildUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,7 +40,8 @@ public class BreakBlockModule implements ProjectileHitBlockHandler {
                 case STAINED_GLASS:
                 case STAINED_GLASS_PANE:
                 case CARPET:
-                        b.setType(Material.AIR, false);
+                    BuildUtil.setNMSBlock(b, Material.AIR, (byte)0, false);
+//                    b.setType(Material.AIR, false);
                     break;
             }
         }

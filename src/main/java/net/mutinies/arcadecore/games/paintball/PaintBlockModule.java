@@ -6,6 +6,7 @@ import net.mutinies.arcadecore.game.config.ConfigProperty;
 import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.team.GameTeam;
 import net.mutinies.arcadecore.module.Module;
+import net.mutinies.arcadecore.util.BuildUtil;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -47,26 +48,20 @@ public class PaintBlockModule implements Module {
                 switch (block.getType()) {
                     case CLAY:
                     case HARD_CLAY:
-                        block.setType(Material.STAINED_CLAY);
+                        BuildUtil.setNMSBlock(block, Material.STAINED_CLAY, dyeColor.getData(), false);
                         break;
                     case GLASS:
-                        block.setType(Material.STAINED_GLASS);
+                        BuildUtil.setNMSBlock(block, Material.STAINED_GLASS, dyeColor.getData(), false);
                         break;
                     case THIN_GLASS:
-                        block.setType(Material.STAINED_GLASS_PANE);
+                        BuildUtil.setNMSBlock(block, Material.STAINED_GLASS_PANE, dyeColor.getData(), false);
                         break;
-                }
-                
-                BlockState state = block.getState();
-                MaterialData data = state.getData();
-                
-                switch (data.getItemType()) {
                     case WOOL:
                     case STAINED_CLAY:
                     case STAINED_GLASS:
                     case STAINED_GLASS_PANE:
                     case CARPET:
-                        block.setData(dyeColor.getData());
+                        BuildUtil.setNMSBlock(block, block.getType(), dyeColor.getData(), false);
                         break;
                 }
             }

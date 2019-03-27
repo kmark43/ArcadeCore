@@ -118,12 +118,11 @@ public class TerritoryModule extends TeamWinHandler {
             if (value >= ((Integer) game.getConfigManager().getProperty("target_score").getValue())) {
                 GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.SCORE);
                 Bukkit.getPluginManager().callEvent(event);
+                winner = game.getTeamManager().getTeam(teamName);
                 if (!event.isCancelled()) {
-                    winner = game.getTeamManager().getTeam(teamName);
                     game.getGameStateManager().stop();
-                } else {
-                    return;
                 }
+                return;
             }
         }
         
@@ -137,15 +136,16 @@ public class TerritoryModule extends TeamWinHandler {
         }
         
         if (teamsInGame.size() <= 1) {
-            GameTeam lastTeam = teamsInGame.size() == 1 ? teamsInGame.get(0) : null;
+            winner = teamsInGame.size() == 1 ? teamsInGame.get(0) : winner;
             
             GameEndCheckEvent event = new GameEndCheckEvent(game, GameEndCheckEvent.CheckReason.TOO_FEW_ALIVE);
             Bukkit.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                winner = lastTeam;
                 game.getGameStateManager().stop();
             }
+            return;
         }
+        winner = null;
     }
     
     private void setScoreboardLines() {
@@ -207,9 +207,8 @@ public class TerritoryModule extends TeamWinHandler {
         }
         
         if (territories.isEmpty()) {
-    
             Bukkit.getScheduler().runTask(ArcadeCorePlugin.getInstance(), () -> {
-                if (winner != null) return;
+                if (game.getGameStateManager().getState() != GameStateManager.GameState.RUNNING) return;
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     other.playSound(other.getLocation(), Sound.SILVERFISH_KILL, 1f, 1f);
                 }
