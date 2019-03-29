@@ -90,7 +90,7 @@ public class ClassicGameManager implements GameManager {
     
             lines.add("");
             lines.add(ChatColor.BOLD + "Players");
-            lines.add(participationManager.getParticipants().size() + "/" + getGame().getMaxPlayers());
+            lines.add(participationManager.getParticipants().size() + "/" + Bukkit.getMaxPlayers());
             
             lines.add("");
             lines.add(ChatColor.BOLD + "Server");
