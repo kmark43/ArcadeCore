@@ -2,6 +2,8 @@ package net.mutinies.arcadecore.games;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.game.Game;
+import net.mutinies.arcadecore.game.config.ConfigProperty;
+import net.mutinies.arcadecore.game.config.ConfigType;
 import net.mutinies.arcadecore.game.kit.BasicKit;
 import net.mutinies.arcadecore.game.kit.armor.TeamArmorGenerator;
 import net.mutinies.arcadecore.games.oitq.GiveArrowOnKillModule;
@@ -82,28 +84,30 @@ public class GameMaker {
         DoubleJumpModule generalDoubleJumpModule = new DoubleJumpModule(.9, .9, true);
         
         PaintballMaker paintballMaker = new PaintballMaker(paintball);
-        paintballMaker.addModule("paint_block", new PaintBlockModule(paintball, 4.5));
+//        paintballMaker.addModule("paint_block", new PaintBlockModule(paintball, 4.5));
+        paintball.getConfigManager().registerProperty(new ConfigProperty(ConfigType.DOUBLE, "radius_scale", 1.0));
+        paintballMaker.removeModule("paint_block");
         paintballMaker.setShowNametags(true);
         
         paintballMaker.getGunModule().unregisterGun("medic");
         paintballMaker.removeKit("medic");
         
-        paintballMaker.getGunModule().getGun("rifle").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 3d))));
+        paintballMaker.getGunModule().getGun("rifle").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 3d, 4.5))));
         paintballMaker.getKit("rifle").addModule(generalDoubleJumpModule);
     
-        paintballMaker.getGunModule().getGun("shotgun").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 2d))));
+        paintballMaker.getGunModule().getGun("shotgun").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 2d, 4.5))));
         paintballMaker.getKit("shotgun").addModule(generalDoubleJumpModule);
     
-        paintballMaker.getGunModule().getGun("machine_gun").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 2d))));
+        paintballMaker.getGunModule().getGun("machine_gun").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 2d, 4.5))));
         paintballMaker.getKit("machine_gun").addModule(generalDoubleJumpModule);
     
-        paintballMaker.getGunModule().getGun("sniper").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 3d))));
+        paintballMaker.getGunModule().getGun("sniper").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 3d, 4.5))));
         paintballMaker.getKit("sniper").addModule(generalDoubleJumpModule);
     
-        paintballMaker.getGunModule().getGun("bazooka").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 4d))));
+        paintballMaker.getGunModule().getGun("bazooka").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 4d, 4.5))));
         paintballMaker.getKit("bazooka").addModule(generalDoubleJumpModule);
     
-        paintballMaker.getGunModule().getGun("needler").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 3d))));
+        paintballMaker.getGunModule().getGun("needler").addLaunchHandler(((gun, player, projectile) -> projectile.addHitBlockHandler(new BreakBlockModule(paintball, 3d, 4.5))));
         paintballMaker.getKit("needler").addModule(generalDoubleJumpModule);
         
         paintballMaker.applyKitsAndModules();
