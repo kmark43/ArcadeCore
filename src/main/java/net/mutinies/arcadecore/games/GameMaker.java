@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 public class GameMaker {
     public static void makeDefaultGames() {
-        makeTestGame();
+//        makeTestGame();
         makePaintball();
         makeTerritoryPaintball();
         makeSpleefPaintball();
@@ -112,6 +112,29 @@ public class GameMaker {
         
         paintballMaker.applyKitsAndModules();
         
+        ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
+    }
+
+    private static void makeFFAPaintball() {
+        Game paintball = new Game("ffa_paintball", "FFA Paintball", "FFAPB", 8, 16);
+        PaintballMaker maker = new PaintballMaker(paintball);
+
+        paintball.setEndHandler(new PlayerEliminationModule(paintball, true));
+        maker.removeModule("no_friendly_fire");
+        maker.getGunModule().unregisterGun("medic");
+        maker.removeKit("medic");
+
+        maker.applyKitsAndModules();
+        ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
+    }
+
+    private static void makeJuggernautPaintball() {
+        Game paintball = new Game("juggernaut_paintball", "Juggernaut Paintball", "JPB", 8, 16);
+        PaintballMaker maker = new PaintballMaker(paintball);
+
+
+
+        maker.applyKitsAndModules();
         ArcadeCorePlugin.getArcadeManager().registerGame(ArcadeCorePlugin.getInstance(), paintball);
     }
     
