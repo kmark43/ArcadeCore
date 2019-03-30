@@ -85,7 +85,7 @@ public class GameMaker {
         
         PaintballMaker paintballMaker = new PaintballMaker(paintball);
 //        paintballMaker.addModule("paint_block", new PaintBlockModule(paintball, 4.5));
-        paintball.getConfigManager().registerProperty(new ConfigProperty(ConfigType.DOUBLE, "radius_scale", 1.0));
+        paintball.getConfigManager().registerProperty(new ConfigProperty(ConfigType.DOUBLE, "radius_scale", 0.9));
         paintballMaker.removeModule("paint_block");
         paintballMaker.setShowNametags(true);
         
