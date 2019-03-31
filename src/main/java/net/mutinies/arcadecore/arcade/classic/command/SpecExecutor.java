@@ -1,4 +1,4 @@
-package net.mutinies.arcadecore.arcade.classic;
+package net.mutinies.arcadecore.arcade.classic.command;
 
 import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.arcade.participation.ParticipationManager;

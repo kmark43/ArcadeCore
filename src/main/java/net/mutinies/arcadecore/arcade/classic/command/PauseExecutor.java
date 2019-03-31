@@ -1,5 +1,6 @@
-package net.mutinies.arcadecore.arcade.classic;
+package net.mutinies.arcadecore.arcade.classic.command;
 
+import net.mutinies.arcadecore.arcade.classic.ClassicGameManager;
 import net.mutinies.arcadecore.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

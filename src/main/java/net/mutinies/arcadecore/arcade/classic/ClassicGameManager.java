@@ -4,6 +4,7 @@ import net.mutinies.arcadecore.ArcadeCorePlugin;
 import net.mutinies.arcadecore.api.GameManager;
 import net.mutinies.arcadecore.api.StartResult;
 import net.mutinies.arcadecore.api.StopResult;
+import net.mutinies.arcadecore.arcade.classic.command.*;
 import net.mutinies.arcadecore.arcade.participation.ParticipationManager;
 import net.mutinies.arcadecore.event.GameSetEvent;
 import net.mutinies.arcadecore.event.PlayerDisableParticipationEvent;
